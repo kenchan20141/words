@@ -954,7 +954,7 @@ function initializeApp() {
             btnText = '開始潤色';
         } else if (newMode === 'prose-polish'){
             prosePolishForm.classList.remove('hidden');
-            btnText = '開始重寫';
+            btnText = '開始潤色';
         }
         submitBtnText.textContent = btnText;
         errorMessage.style.display = 'none';
@@ -1004,7 +1004,7 @@ function initializeApp() {
             } else if (state.activeMode === 'prose-polish') {
                 const text = prosePolishTextarea.value.trim();
                  if (!text) {
-                    showError('請輸入需要進行「文句」重寫的內容。');
+                    showError('請輸入需要潤色「文句」的內容。');
                     return;
                 }
                 setLoading(true, '潤色中...');
