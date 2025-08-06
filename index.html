@@ -959,7 +959,7 @@ function initializeApp() {
                     showError('請輸入需要進行「文句」重寫的內容。');
                     return;
                 }
-                setLoading(true, '重寫中...');
+                setLoading(true, '潤色中...');
                 const result = await fetchProsePolishedText(text, state.prosePolishDifficulty);
                 if (result) {
                     state.currentResults = [result];
@@ -1516,7 +1516,7 @@ ${jsonFormatInstruction}`;
             const textToCopy = copyBtn.dataset.textToCopy;
             if (textToCopy) {
                  navigator.clipboard.writeText(textToCopy.replace(/&quot;/g, '"').replace(/&amp;/g, '&')).then(() => {
-                    showToast('潤色後的全文已複製到剪貼簿', 'success');
+                    showToast('已複製到剪貼簿', 'success');
                 }).catch(err => {
                     console.error('Failed to copy text: ', err);
                     showToast('複製失敗，瀏覽器不支援或未授權', 'error');
