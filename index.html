@@ -1102,7 +1102,7 @@ JSON 格式範例:
                     messages: [{ role: "user", content: systemPrompt }],
                     response_format: { type: "json_object" },
                     max_tokens: 4096,
-                    temperature: 0.8
+                    temperature: 1
                 })
             });
             if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
@@ -1172,7 +1172,7 @@ JSON 格式範例:
                     messages: [{ role: "user", content: systemPrompt }],
                     response_format: { type: "json_object" },
                     max_tokens: 4096,
-                    temperature: 0.7
+                    temperature: 1
                 })
             });
             if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
