@@ -1,1 +1,1440 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>詞彙・寫作</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
 
+<style>
+/* --- 1. 核心與主題設定 (Core & Theming) --- */
+:root {
+    /* 參考「一瞬之詩」的亮色主題 */
+    --bg-color-light: #F5F3EF; /* 仿宣紙的米白 */
+    --text-primary-light: #3D3B37; /* 墨色 */
+    --text-secondary-light: #A39B8B; /* 枯木色 */
+    --content-bg-light: #FFFFFF;
+    --border-color-light: #DCD6C8; /* 淺石色 */
+    --accent-color: #A39B8B; /* 枯木色 */
+    --accent-color-hover: #8E8473;
+
+    /* 基於亮色主題推衍的暗色主題 */
+    --bg-color-dark: #282623;
+    --text-primary-dark: #D1CFCB;
+    --text-secondary-dark: #888279;
+    --content-bg-dark: #3D3B37;
+    --border-color-dark: #5A5650;
+
+    --overlay-bg: rgba(44, 62, 80, 0.7);
+
+    --font-sans: 'Noto Sans TC', sans-serif;
+    --font-serif: 'Noto Serif TC', serif;
+    --max-width: 900px; /* 調整最大寬度以適應內容 */
+
+    --reader-font-size: 1.1rem;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    transition: background-color 0.4s, color 0.4s;
+    line-height: 1.8;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body.light-mode {
+    background-color: var(--bg-color-light);
+    color: var(--text-primary-light);
+}
+
+body.dark-mode {
+    background-color: var(--bg-color-dark);
+    color: var(--text-primary-dark);
+}
+
+/* --- 2. 全域版面與容器 (Global Layout & Containers) --- */
+.page-container {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+}
+
+.hidden { display: none !important; }
+
+/* --- 3. UI 控制項 (UI Controls & Icons) --- */
+.icon-btn {
+    background: none; border: none; cursor: pointer;
+    padding: 0.5rem; border-radius: 50%;
+    display: inline-flex; justify-content: center; align-items: center;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.icon-btn svg {
+    width: 24px; height: 24px; stroke-width: 1.5;
+    transition: stroke 0.2s;
+}
+.light-mode .icon-btn svg { stroke: var(--text-primary-light); }
+.dark-mode .icon-btn svg { stroke: var(--text-primary-dark); }
+.light-mode .icon-btn:hover { background-color: rgba(0,0,0,0.05); }
+.dark-mode .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
+.icon-btn:hover { transform: scale(1.1); }
+.fullscreen-btn .icon-exit-fullscreen { display: none; }
+
+/* --- 4. 主要區塊：設定、閱讀器 (Main Sections: Settings, Reader) --- */
+.main-content-wrapper { width: 100%; max-width: var(--max-width); transition: all 0.4s ease-in-out; }
+.settings-card, .reader-card {
+    border: 1px solid;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 2rem 3rem;
+    transition: background-color 0.4s, border-color 0.4s;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+.light-mode .settings-card, .light-mode .reader-card { background-color: rgba(255, 255, 255, 0.5); border-color: var(--border-color-light); }
+.dark-mode .settings-card, .dark-mode .reader-card { background-color: rgba(40, 38, 35, 0.7); border-color: var(--border-color-dark); }
+
+/* --- 5. 設定區塊樣式 (Settings Section Styles) --- */
+.settings-header { display: flex; justify-content: space-between; align-items: flex-start; position: relative; margin-bottom: 2rem; }
+.settings-header .title-group { text-align: center; width: 100%; }
+.settings-header .title-group h1 { font-family: var(--font-serif); font-weight: 700; font-size: 2.2rem; letter-spacing: 0.2em; margin-bottom: 0.5rem; }
+.settings-header .title-group p { font-size: 1rem; }
+.light-mode .settings-header .title-group p { color: var(--text-secondary-light); }
+.dark-mode .settings-header .title-group p { color: var(--text-secondary-dark); }
+.settings-header .header-controls { position: absolute; top: -12px; right: -16px; display: flex; align-items: center; gap: 0.25rem; }
+
+/* Mode Switcher */
+.mode-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid;
+}
+.light-mode .mode-switcher { border-color: var(--border-color-light); }
+.dark-mode .mode-switcher { border-color: var(--border-color-dark); }
+.mode-btn {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s;
+}
+.light-mode .mode-btn { color: var(--text-secondary-light); }
+.dark-mode .mode-btn { color: var(--text-secondary-dark); }
+.light-mode .mode-btn.active { color: var(--text-primary-light); }
+.dark-mode .mode-btn.active { color: var(--text-primary-dark); }
+
+.mode-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--accent-color);
+    transform: scaleX(0);
+    transition: transform 0.3s ease-out;
+}
+.mode-btn.active::after {
+    transform: scaleX(1);
+}
+
+.form-container { padding-top: 0.5rem; }
+.form-group { margin-bottom: 1.75rem; }
+.form-group label { display: block; margin-bottom: 0.75rem; font-weight: 500; font-size: 1.1rem; }
+
+/* General input styles */
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0px; /* More minimalist */
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.6;
+    border: 1px solid;
+    transition: background-color 0.4s, color 0.4s, border-color 0.4s;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+}
+.light-mode input[type="text"], .light-mode textarea, .light-mode select {
+    background-color: transparent;
+    border-color: var(--border-color-light);
+    color: var(--text-primary-light);
+}
+.dark-mode input[type="text"], .dark-mode textarea, .dark-mode select {
+    background-color: var(--bg-color-dark);
+    border-color: var(--border-color-dark);
+    color: var(--text-primary-dark);
+}
+input[type="text"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(163, 155, 139, 0.3);
+}
+
+select {
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: .65em auto;
+    cursor: pointer;
+}
+.light-mode select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%233D3B37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); }
+.dark-mode select { background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D1CFCB%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E'); }
+
+textarea { min-height: 120px; }
+
+/* Difficulty Rating */
+.rating-dots { display: flex; gap: 12px; cursor: pointer; }
+.rating-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid; transition: all 0.2s ease-in-out; }
+.light-mode .rating-dot { border-color: #ccc; }
+.dark-mode .rating-dot { border-color: #555; }
+.rating-dots:hover .rating-dot, .rating-dots .rating-dot.selected { border-color: var(--accent-color); background-color: var(--accent-color); transform: scale(1.1); }
+.rating-dots:hover .rating-dot:hover ~ .rating-dot { background-color: transparent; border-color: #ccc; }
+.dark-mode .rating-dots:hover .rating-dot:hover ~ .rating-dot { border-color: #555; }
+#error-message { color: #e74c3c; margin-top: 0.5rem; display: none; font-size: 0.9rem; text-align: center; }
+
+.submit-btn {
+    background-color: var(--accent-color); color: var(--bg-color-light); border: none; padding: 0.75rem 1.75rem; cursor: pointer;
+    font-family: inherit; font-size: 1.1rem; font-weight: 500; transition: background-color 0.3s, transform 0.2s;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 1rem; border-radius: 0;
+}
+.submit-btn:hover { background-color: var(--accent-color-hover); }
+.submit-btn:active { transform: scale(0.98); }
+.submit-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+.loader { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- 6. 詞彙結果頁面 (Reader Section) --- */
+.reader-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0 0.5rem; }
+.reader-controls .left-controls, .reader-controls .right-controls { display: flex; align-items: center; gap: 0.5rem; }
+.reader-pagination { font-family: var(--font-sans); font-size: 0.9rem; text-align: center; }
+.light-mode .reader-pagination { color: var(--text-secondary-light); }
+.dark-mode .reader-pagination { color: var(--text-secondary-dark); }
+.font-controls { display: flex; align-items: center; gap: 0.25rem; border-right: 1px solid; padding-right: 0.75rem; margin-right: 0.25rem;}
+.light-mode .font-controls { border-color: var(--border-color-light); }
+.dark-mode .font-controls { border-color: var(--border-color-dark); }
+
+/* --- 7. 詞彙展示區 (Book/Vocabulary Display) --- */
+.book-container { width: 100%; height: 70vh; min-height: 500px; display: flex; justify-content: center; align-items: center; overflow: hidden; user-select: none; cursor: grab; margin-top: 0; margin-bottom: 2.5rem; }
+.book-container:active { cursor: grabbing; }
+.book { width: 100%; height: 100%; display: flex; }
+.page { width: 100%; height: 100%; flex-shrink: 0; position: relative; border: 1px solid; }
+
+.page-content { 
+    width: 100%; height: 100%; padding: 3rem 2.5rem; overflow-y: auto; 
+    font-family: var(--font-sans); font-size: var(--reader-font-size); line-height: 2;
+}
+.light-mode .page { background: var(--content-bg-light); border-color: var(--border-color-light); }
+.dark-mode .page { background: var(--content-bg-dark); border-color: var(--border-color-dark); }
+.light-mode .page-content { color: var(--text-primary-light); }
+.dark-mode .page-content { color: var(--text-primary-dark); }
+
+/* Vocabulary Display Styles */
+.vocab-header {
+    font-family: var(--font-serif);
+    font-size: calc(var(--reader-font-size) + 1.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+}
+.light-mode .vocab-header { border-color: var(--border-color-light); }
+.dark-mode .vocab-header { border-color: var(--border-color-dark); }
+
+.vocab-definition-container {
+    background: rgba(163, 155, 139, 0.07);
+    border-left: 3px solid var(--accent-color);
+    padding: 1rem 1.5rem;
+    margin: 2.5rem 0;
+}
+.dark-mode .vocab-definition-container {
+    background: rgba(255, 255, 255, 0.05);
+}
+.vocab-definition {
+    font-size: calc(var(--reader-font-size) + 0.05rem);
+    font-family: var(--font-serif);
+    line-height: 1.9;
+    margin: 0; /* Override default p margin */
+}
+/* For polished text display */
+.polished-text-content {
+    white-space: pre-wrap; /* Preserve paragraphs */
+    font-family: var(--font-serif);
+    font-size: calc(var(--reader-font-size) + 0.1rem);
+    line-height: 2;
+}
+
+.vocab-examples {
+    list-style-type: none; /* Remove default bullets */
+    padding-left: 0;
+}
+.vocab-examples li {
+    margin-bottom: 1.5em;
+    padding-left: 1.5em;
+    position: relative;
+    font-family: var(--font-serif);
+    letter-spacing: 0.05em;
+    font-size: calc(var(--reader-font-size) - 0.05rem);
+}
+.vocab-examples li::before {
+    content: '「';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent-color);
+    font-weight: 600;
+}
+.vocab-examples li::after {
+    content: '」';
+    color: var(--accent-color);
+    font-weight: 600;
+    display: inline;
+    margin-left: 0.2em;
+}
+
+/* --- 8. 全螢幕模式 (Fullscreen Mode) --- */
+body.fullscreen-mode { overflow: hidden; }
+body.light-mode.fullscreen-mode { background-color: var(--content-bg-light); }
+body.dark-mode.fullscreen-mode { background-color: var(--content-bg-dark); }
+body.fullscreen-mode .page-container { padding: 0; }
+body.fullscreen-mode .main-content-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: none; z-index: 1000; }
+body.fullscreen-mode .reader-card { border-radius: 0; border: none; box-shadow: none; height: 100%; display: flex; flex-direction: column; padding: 2rem; }
+body.fullscreen-mode .book-container { flex-grow: 1; min-height: auto; height: auto; }
+body.fullscreen-mode .fullscreen-btn .icon-enter-fullscreen { display: none; }
+body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
+
+/* --- 9. 歷史紀錄彈窗 (History Modal) --- */
+.history-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--overlay-bg);
+    display: flex; justify-content: center; align-items: center; z-index: 2000;
+    opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0s 0.3s;
+}
+.history-modal.is-visible { opacity: 1; visibility: visible; transition-delay: 0s; }
+.history-container {
+    width: 90%; max-width: 700px; max-height: 80vh; padding: 1.5rem 2rem;
+    display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: scale(0.95); transition: transform 0.3s, background-color 0.4s;
+    border: 1px solid;
+}
+.light-mode .history-container { background-color: var(--content-bg-light); border-color: var(--border-color-light); }
+.dark-mode .history-container { background-color: var(--content-bg-dark); border-color: var(--border-color-dark); }
+.history-modal.is-visible .history-container { transform: scale(1); }
+.history-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid; }
+.light-mode .history-header { border-color: var(--border-color-light); }
+.dark-mode .history-header { border-color: var(--border-color-dark); }
+.history-header h2 { font-size: 1.5rem; font-weight: 500; }
+.history-controls { display: flex; gap: 1rem; margin-bottom: 1rem; }
+#history-search { flex-grow: 1; padding: 0.5rem 0.75rem; font-size: 1rem; font-family: var(--font-sans); border-radius: 0; }
+#history-sort { padding: 0.5rem; font-size: 1rem; font-family: var(--font-sans); border-radius: 0; }
+.light-mode #history-search, .light-mode #history-sort { background-color: var(--bg-color-light); border: 1px solid var(--border-color-light); color: var(--text-primary-light); }
+.dark-mode #history-search, .dark-mode #history-sort { background-color: var(--bg-color-dark); border: 1px solid var(--border-color-dark); color: var(--text-primary-dark); }
+#history-search:focus, #history-sort:focus { outline: none; border-color: var(--accent-color); }
+.history-list { list-style: none; overflow-y: auto; flex-grow: 1; }
+.history-list li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 1rem; transition: background-color 0.2s; border-bottom: 1px solid; }
+.history-list li.is-loading { opacity: 0.5; pointer-events: none; }
+.history-list li:last-child { border-bottom: none; }
+.history-item-content { flex-grow: 1; cursor: pointer; }
+.history-list-item-title { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 600; }
+.history-list-item-meta { font-family: var(--font-sans); font-size: 0.9rem; margin-top: 0.25rem; }
+.light-mode .history-list li { border-color: var(--border-color-light); }
+.dark-mode .history-list li { border-color: var(--border-color-dark); }
+.light-mode .history-item-content:hover { background-color: var(--bg-color-light); }
+.dark-mode .history-item-content:hover { background-color: var(--bg-color-dark); }
+.light-mode .history-list-item-meta { color: var(--text-secondary-light); }
+.dark-mode .history-list-item-meta { color: var(--text-secondary-dark); }
+.history-item-actions { display: flex; align-items: center; gap: 0.25rem; }
+.history-item-actions .icon-btn svg { width: 20px; height: 20px; }
+.light-mode .delete-history-btn:hover svg, .light-mode #delete-all-history-btn:hover svg { stroke: #e74c3c; }
+.dark-mode .delete-history-btn:hover svg, .dark-mode #delete-all-history-btn:hover svg { stroke: #e74c3c; }
+.light-mode .regenerate-history-btn:hover svg { stroke: var(--accent-color-hover); }
+.dark-mode .regenerate-history-btn:hover svg { stroke: var(--accent-color-hover); }
+
+.no-history-msg { padding: 2rem; text-align: center; justify-content: center; }
+.light-mode .no-history-msg { color: var(--text-secondary-light); }
+.dark-mode .no-history-msg { color: var(--text-secondary-dark); }
+
+/* --- 10. 響應式設計 (Responsive Design) --- */
+@media (max-width: 768px) {
+    .main-content-wrapper { width: 95%; }
+    .page-container { padding: 1rem 0; }
+    .settings-card, .reader-card { padding: 1.5rem; box-shadow: none; }
+    body.fullscreen-mode .reader-card { padding: 1.5rem; }
+    .settings-header { margin-bottom: 2rem; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .settings-header .title-group h1 { font-size: 1.8rem; }
+    .settings-header .header-controls { position: static; }
+    .mode-switcher { flex-wrap: wrap; }
+    .mode-btn { padding: 0.75rem 1rem; }
+    .reader-controls .left-controls, .reader-controls .right-controls { gap: 0.2rem; }
+    .page-content { padding: 2rem 1.5rem; }
+    .history-controls { flex-direction: column; }
+}
+
+/* --- 11. 版權聲明 (Copyright) --- */
+.copyright-footer {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 5px 10px;
+    z-index: 500;
+    transition: background-color 0.4s, color 0.4s;
+}
+.light-mode .copyright-footer { background-color: var(--bg-color-light); }
+.dark-mode .copyright-footer { background-color: var(--bg-color-dark); }
+.copyright-footer p { margin: 0; font-size: 14px; }
+.light-mode .copyright-footer p { color: var(--text-secondary-light); }
+.dark-mode .copyright-footer p { color: var(--text-secondary-dark); }
+@media (max-width: 600px) { .copyright-footer p { font-size: 12px; } }
+
+/* --- 12. [REVISION] 潤色模式比對樣式 --- */
+.polish-view-switcher {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid;
+}
+.light-mode .polish-view-switcher { border-color: var(--border-color-light); }
+.dark-mode .polish-view-switcher { border-color: var(--border-color-dark); }
+.polish-view-btn {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s;
+    margin-bottom: -1px;
+}
+.light-mode .polish-view-btn { color: var(--text-secondary-light); }
+.dark-mode .polish-view-btn { color: var(--text-secondary-dark); }
+.polish-view-btn.active {
+    border-bottom: 2px solid var(--accent-color);
+}
+.light-mode .polish-view-btn.active { color: var(--text-primary-light); }
+.dark-mode .polish-view-btn.active { color: var(--text-primary-dark); }
+
+.comparison-container { display: flex; flex-direction: column; gap: 2rem; }
+.comparison-pair {
+    display: grid;
+    /* [REVISION] Changed to 1fr for vertical stacking by default */
+    grid-template-columns: 1fr; 
+    gap: 1.5rem;
+}
+
+.original-para, .polished-para {
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    line-height: 1.9;
+    font-family: var(--font-serif);
+    font-size: calc(var(--reader-font-size) - 0.05rem);
+    white-space: pre-wrap;
+    border: 1px solid;
+}
+.light-mode .original-para { background-color: #fdf8f2; border-color: var(--border-color-light); }
+.light-mode .polished-para { background-color: #f2f7fd; border-color: var(--border-color-light); }
+.dark-mode .original-para { background-color: #3a3631; border-color: var(--border-color-dark); }
+.dark-mode .polished-para { background-color: #2f3b48; border-color: var(--border-color-dark); }
+
+.para-marker {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: var(--text-secondary-light);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-sans);
+}
+.dark-mode .para-marker {
+    color: var(--text-secondary-dark);
+}
+
+mark.mark-original {
+    background-color: #ffe0b3; /* Light Orange */
+    color: inherit;
+    padding: 0.1em 0;
+    border-radius: 2px;
+}
+mark.mark-polished {
+    background-color: #cceeff; /* Light Blue */
+    color: inherit;
+    padding: 0.1em 0;
+    cursor: pointer;
+    border-radius: 2px;
+    border-bottom: 1px dotted var(--accent-color);
+}
+.dark-mode mark.mark-original {
+    background-color: #5c421a;
+}
+.dark-mode mark.mark-polished {
+    background-color: #1a4a5c;
+}
+
+/* --- [REVISION] Notification Toast --- */
+.vocab-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent-color);
+    color: var(--bg-color-light);
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s, visibility 0.4s, bottom 0.4s;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+.vocab-toast.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: 30px;
+}
+
+</style>
+</head>
+<body class="light-mode">
+
+<!-- Main Content -->
+<div class="page-container">
+<div class="main-content-wrapper">
+<!-- 設定卡片 (初始顯示) -->
+<section class="settings-card" id="settings-section">
+    <header class="settings-header">
+        <div class="title-group">
+            <h1>詞彙・寫作</h1>
+            <p>煉字——對思想最大的忠誠。</p>
+        </div>
+        <div class="header-controls">
+            <button class="icon-btn" id="history-btn" title="查找紀錄">
+                <!-- Book Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20v2H6.5A2.5 2.5 0 0 1 4 19.5z"></path><path d="M4 5h16v12H6.5A2.5 2.5 0 0 1 4 14.5V5zM7 7v2m3-2v2"></path></svg>
+            </button>
+            <button class="icon-btn theme-switcher-btn" id="settings-theme-switcher" title="切換主題">
+                <svg class="icon-theme-light" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <svg class="icon-theme-dark hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="mode-switcher">
+        <button class="mode-btn active" data-mode="lookup">查找詞彙</button>
+        <button class="mode-btn" data-mode="generate">隨機找詞</button>
+        <button class="mode-btn" data-mode="polish">詞句潤色</button>
+    </div>
+    
+    <div class="form-container">
+        <!-- 查找詞彙表單 (預設顯示) -->
+        <form id="lookup-form">
+            <div class="form-group">
+                <label for="lookup-word">查找</label>
+                <input type="text" id="lookup-word" placeholder="輸入一個詞彙...">
+            </div>
+        </form>
+
+        <!-- 隨機生成表單 (預設隱藏) -->
+        <form id="generate-form" class="hidden">
+            <div class="form-group">
+                <label for="generate-difficulty">深度</label>
+                <div class="rating-dots" id="generate-difficulty-rating" data-rating="3">
+                    <div class="rating-dot" data-value="1"></div><div class="rating-dot" data-value="2"></div>
+                    <div class="rating-dot selected" data-value="3"></div><div class="rating-dot" data-value="4"></div>
+                    <div class="rating-dot" data-value="5"></div>
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="word-count">數量</label>
+                <select id="word-count">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3" selected>3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="prompt">主題</label>
+                <textarea id="prompt" placeholder="可輸入關鍵詞，引導生成方向..."></textarea>
+            </div>
+        </form>
+
+        <!-- 潤色模式表單 (預設隱藏) -->
+        <form id="polish-form" class="hidden">
+            <div class="form-group">
+                <label for="polish-text">原文</label>
+                <textarea id="polish-text" placeholder="在此輸入您希望潤色的段落或文章..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="polish-difficulty">深度</label>
+                <div class="rating-dots" id="polish-difficulty-rating" data-rating="3">
+                    <div class="rating-dot" data-value="1"></div><div class="rating-dot" data-value="2"></div>
+                    <div class="rating-dot selected" data-value="3"></div><div class="rating-dot" data-value="4"></div>
+                    <div class="rating-dot" data-value="5"></div>
+                </div>
+            </div>
+        </form>
+
+        <button type="submit" id="submit-btn" class="submit-btn">
+            <span class="btn-text">開始查找</span>
+        </button>
+        <div id="error-message"></div>
+    </div>
+</section>
+
+
+<!-- 閱讀器卡片 (初始隱藏) -->
+<section class="reader-card hidden" id="reading-section">
+<div class="reader-controls">
+    <div class="left-controls">
+        <button class="icon-btn" id="back-to-settings-btn" title="返回設定">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+    </div>
+    <div id="reader-pagination" class="reader-pagination"></div>
+    <div class="right-controls">
+        <div class="font-controls">
+             <button class="icon-btn" id="font-size-decrease-btn" title="縮小字體">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;"><path d="M4 12h8m-8 0v-2a2 2 0 0 1 2-2h2"/><path d="M4 7V6a2 2 0 0 1 2-2h2"/><path d="M10 7V6a2 2 0 0 1 2-2h1"/><text x="16" y="16" font-size="10" font-family="sans-serif" text-anchor="middle">A</text></svg>
+            </button>
+            <button class="icon-btn" id="font-size-increase-btn" title="放大字體">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px;"><path d="M4 12h8m-8 0v-2a2 2 0 0 1 2-2h2"/><path d="M4 7V6a2 2 0 0 1 2-2h2"/><path d="M10 7V6a2 2 0 0 1 2-2h1"/><text x="17" y="17" font-size="12" font-family="sans-serif" text-anchor="middle">A</text></svg>
+            </button>
+        </div>
+        <button class="icon-btn theme-switcher-btn" id="reader-theme-switcher" title="切換主題">
+            <svg class="icon-theme-light" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="icon-theme-dark hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+        <button class="icon-btn fullscreen-btn" id="fullscreen-btn" title="全螢幕模式">
+            <svg class="icon-enter-fullscreen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            <svg class="icon-exit-fullscreen" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0-2-2h-3m-12 0H5a2 2 0 0 0-2 2v3"></path></svg>
+        </button>
+    </div>
+</div>
+<div class="book-container" id="book-container">
+    <div class="book" id="book"></div>
+</div>
+</section>
+</div>
+</div>
+
+<!-- 歷史紀錄彈出層 (Modal) -->
+<div class="history-modal" id="history-modal">
+<div class="history-container">
+    <div class="history-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <h2>查找紀錄</h2>
+            <button class="icon-btn" id="delete-all-history-btn" title="刪除全部紀錄">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+        </div>
+        <button class="icon-btn" id="history-close-btn" title="關閉">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+    </div>
+    <div class="history-controls">
+        <input type="number" id="history-search" placeholder="按首字筆劃數搜尋...">
+        <select id="history-sort">
+            <option value="date_desc">按生成日期 (新到舊)</option>
+            <option value="date_asc">按生成日期 (舊到新)</option>
+            <option value="stroke_asc">按首字筆劃 (少到多)</option>
+            <option value="stroke_desc">按首字筆劃 (多到少)</option>
+        </select>
+    </div>
+    <ul class="history-list" id="history-list"></ul>
+</div>
+</div>
+
+<footer class="copyright-footer">
+<p>Copyright © 2025 陳冠健. All rights reserved.</p>
+</footer>
+
+<script>
+// --- Main application logic ---
+function initializeApp() {
+    // --- 1. DOM 元素選擇 ---
+    const body = document.body;
+    const root = document.documentElement;
+    const settingsSection = document.getElementById('settings-section');
+    const readingSection = document.getElementById('reading-section');
+    const themeSwitchers = document.querySelectorAll('.theme-switcher-btn');
+    
+    // Mode switcher
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const lookupForm = document.getElementById('lookup-form');
+    const generateForm = document.getElementById('generate-form');
+    const polishForm = document.getElementById('polish-form');
+    
+    // Forms
+    const lookupWordInput = document.getElementById('lookup-word');
+    const generateDifficultyRating = document.getElementById('generate-difficulty-rating');
+    const wordCountSelect = document.getElementById('word-count');
+    const promptTextarea = document.getElementById('prompt');
+    const polishTextarea = document.getElementById('polish-text');
+    const polishDifficultyRating = document.getElementById('polish-difficulty-rating');
+
+    const submitBtn = document.getElementById('submit-btn');
+    const submitBtnText = submitBtn.querySelector('.btn-text');
+    const errorMessage = document.getElementById('error-message');
+
+    // Reader
+    const book = document.getElementById('book');
+    const bookContainer = document.getElementById('book-container');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const backToSettingsBtn = document.getElementById('back-to-settings-btn');
+    const fontSizeIncreaseBtn = document.getElementById('font-size-increase-btn');
+    const fontSizeDecreaseBtn = document.getElementById('font-size-decrease-btn');
+    const readerPagination = document.getElementById('reader-pagination');
+
+    // History
+    const historyBtn = document.getElementById('history-btn');
+    const historyModal = document.getElementById('history-modal');
+    const historyCloseBtn = document.getElementById('history-close-btn');
+    const historyList = document.getElementById('history-list');
+    const historySearch = document.getElementById('history-search');
+    const historySort = document.getElementById('history-sort');
+    const deleteAllHistoryBtn = document.getElementById('delete-all-history-btn');
+
+    // --- API 配置 ---
+    const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
+    const API_KEY = "sk-GruTbLTbtSeWof3rEBjtIg"; // 自動填入的 API Key
+
+    // --- 2. 狀態管理 ---
+    let state = {
+        activeMode: 'lookup', // 'lookup', 'generate', or 'polish'
+        generateDifficulty: 3,
+        polishDifficulty: 3,
+        history: JSON.parse(localStorage.getItem('vocabHistory_v2')) || [],
+        currentResults: null,
+        currentPageNum: 0,
+        totalPages: 0,
+        fontSize: 1.1,
+    };
+    let isDragging = false, dragStartX = 0, currentTranslate = 0, startTranslate = 0;
+
+    // --- 3. 初始化 ---
+    const initTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light-mode';
+        body.className = savedTheme;
+        updateThemeIcons(savedTheme);
+    };
+
+    const initFontSize = () => {
+        state.fontSize = parseFloat(localStorage.getItem('fontSize')) || 1.1;
+        root.style.setProperty('--reader-font-size', `${state.fontSize}rem`);
+    };
+
+    function initializeDifficultyRating(ratingContainer) {
+        const dots = ratingContainer.querySelectorAll('.rating-dot');
+        const stateKey = ratingContainer.id.includes('generate') ? 'generateDifficulty' : 'polishDifficulty';
+        
+        const updateDots = () => {
+            dots.forEach(dot => {
+                dot.classList.toggle('selected', parseInt(dot.dataset.value) <= state[stateKey]);
+            });
+        };
+        
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                state[stateKey] = parseInt(dot.dataset.value);
+                ratingContainer.dataset.rating = state[stateKey];
+                updateDots();
+            });
+            dot.addEventListener('mouseover', () => {
+                const hoverValue = parseInt(dot.dataset.value);
+                dots.forEach(d => d.classList.toggle('selected', d.dataset.value <= hoverValue));
+            });
+        });
+        
+        ratingContainer.addEventListener('mouseleave', updateDots);
+        updateDots();
+    }
+
+    initTheme();
+    initFontSize();
+    initializeDifficultyRating(generateDifficultyRating);
+    initializeDifficultyRating(polishDifficultyRating);
+
+    // --- 4. 事件監聽器 ---
+    themeSwitchers.forEach(switcher => switcher.addEventListener('click', toggleTheme));
+    
+    modeBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+    });
+
+    submitBtn.addEventListener('click', handleSubmit);
+    
+    fullscreenBtn.addEventListener('click', toggleFullscreen);
+    backToSettingsBtn.addEventListener('click', () => {
+        if (document.fullscreenElement || body.classList.contains('fullscreen-mode')) {
+            toggleFullscreen();
+        }
+        switchToSettingsView();
+    });
+
+    fontSizeIncreaseBtn.addEventListener('click', () => changeFontSize(0.1));
+    fontSizeDecreaseBtn.addEventListener('click', () => changeFontSize(-0.1));
+
+    historyBtn.addEventListener('click', showHistory);
+    historyCloseBtn.addEventListener('click', hideHistory);
+    deleteAllHistoryBtn.addEventListener('click', deleteAllHistory);
+    historyModal.addEventListener('click', (e) => { if (e.target === historyModal) hideHistory(); });
+    historyList.addEventListener('click', handleHistoryListClick);
+    historySearch.addEventListener('input', renderHistory);
+    historySort.addEventListener('change', renderHistory);
+    
+    bookContainer.addEventListener('mousedown', dragStart);
+    bookContainer.addEventListener('touchstart', dragStart, { passive: true });
+    document.addEventListener('mousemove', dragMove);
+    document.addEventListener('touchmove', dragMove, { passive: true });
+    document.addEventListener('mouseup', dragEnd);
+    document.addEventListener('touchend', dragEnd);
+    
+    readingSection.addEventListener('click', handlePolishedWordClick);
+
+
+    // --- 5. 核心功能函式 ---
+    
+    function toggleTheme() {
+        const newTheme = body.classList.contains('light-mode') ? 'dark-mode' : 'light-mode';
+        body.className = newTheme;
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcons(newTheme);
+
+        if (!readingSection.classList.contains('hidden') && state.currentResults) {
+            setTimeout(() => displayResultsAsBook(state.currentResults), 50);
+        }
+    }
+
+    function updateThemeIcons(theme) {
+        themeSwitchers.forEach(switcher => {
+            const lightIcon = switcher.querySelector('.icon-theme-light');
+            const darkIcon = switcher.querySelector('.icon-theme-dark');
+            if(lightIcon && darkIcon) {
+                lightIcon.classList.toggle('hidden', theme === 'dark-mode');
+                darkIcon.classList.toggle('hidden', theme === 'light-mode');
+            }
+        });
+    }
+    
+    function switchMode(newMode) {
+        state.activeMode = newMode;
+        modeBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === newMode);
+        });
+        
+        lookupForm.classList.add('hidden');
+        generateForm.classList.add('hidden');
+        polishForm.classList.add('hidden');
+
+        let btnText = '';
+        if (newMode === 'lookup') {
+            lookupForm.classList.remove('hidden');
+            btnText = '開始查找';
+        } else if (newMode === 'generate') {
+            generateForm.classList.remove('hidden');
+            btnText = '開始生成';
+        } else { // polish mode
+            polishForm.classList.remove('hidden');
+            btnText = '開始潤色';
+        }
+        submitBtnText.textContent = btnText;
+        errorMessage.style.display = 'none';
+    }
+
+    function setLoading(isLoading, text = '執行中...') {
+        submitBtn.disabled = isLoading;
+        submitBtnText.textContent = text;
+        const existingLoader = submitBtn.querySelector('.loader');
+        if (isLoading) {
+            if (!existingLoader) {
+                const loader = document.createElement('div');
+                loader.className = 'loader';
+                submitBtn.insertBefore(loader, submitBtnText);
+            }
+        } else {
+            if (existingLoader) existingLoader.remove();
+            switchMode(state.activeMode); // Restore button text
+        }
+    }
+    
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        errorMessage.style.display = 'none';
+        
+        try {
+            if (state.activeMode === 'polish') {
+                const text = polishTextarea.value.trim();
+                 if (!text) {
+                    showError('請輸入需要潤色的內容。');
+                    return;
+                }
+                setLoading(true, '潤色中...');
+                const result = await fetchPolishedText(text, state.polishDifficulty);
+                if (result) {
+                    state.currentResults = [result];
+                    state.currentPageNum = 0;
+                    displayResultsAsBook(state.currentResults);
+                    switchToReaderView();
+                }
+            } else {
+                let options = {};
+                if (state.activeMode === 'lookup') {
+                    const word = lookupWordInput.value.trim();
+                    if (!word) {
+                        showError('請輸入要查找的詞彙。');
+                        return;
+                    }
+                    options = { mode: 'lookup', query: word };
+                    setLoading(true, '查找中...');
+                } else { // 'generate' mode
+                    options = {
+                        mode: 'generate',
+                        difficulty: state.generateDifficulty,
+                        count: parseInt(wordCountSelect.value),
+                        topic: promptTextarea.value.trim()
+                    };
+                    setLoading(true, '生成中...');
+                }
+                
+                const results = await fetchVocabulary(options);
+                if (results && results.length > 0) {
+                    state.currentResults = results;
+                    addToHistory(results);
+                    state.currentPageNum = 0;
+                    displayResultsAsBook(results);
+                    switchToReaderView();
+                }
+            }
+        } catch (error) {
+            console.error('Submit process error:', error);
+            showError(`處理失敗: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function fetchPolishedText(text, difficulty) {
+        // [REVISION] Added a unique ID to the prompt to force re-generation.
+        const systemPrompt = `你是一位專業的中文編輯。你的任務是潤飾使用者提供的文章，但【絕對不能】改變原文的核心意義。請根據指定的難度（1-5），將文中的部分【兩字或四字詞彙】替換成更典雅、精準或富有文學性的同義詞。
+
+重要指示:
+1.  保持原文的結構、語氣和核心意義不變。
+2.  僅替換詞彙，不要增刪句子或改變句式，盡力保持段落數量一致。
+3.  難度為 1-2 時，使用常用但更精確的詞語。難度為 3 時，使用書面語或成語。難度為 4-5 時，可使用較為冷僻或古典的詞彙。
+4.  你的回傳內容必須是【單一的 JSON 物件】，絕對不要包含任何 markdown 語法或額外說明。
+5.  所有文字都必須是繁體中文。
+6.  JSON 物件必須包含兩個 keys:
+    a. "polishedText": (string) 包含潤飾後的完整全文。
+    b. "changes": (array of objects) 一個陣列，列出所有被替換的詞彙。每個物件包含 "original" (潤飾前的詞) 和 "polished" (潤飾後的詞)。
+       - 【重要】"changes" 陣列中的詞彙【必須】是兩個字或四個字。
+7.  為了確保每次都能生成全新的潤色結果，請將此唯一請求 ID 納入考量：${Date.now()}。
+
+潤飾難度: ${difficulty}
+原文:
+---
+${text}
+---
+
+JSON 格式範例:
+{
+  "polishedText": "她芳齡幾何，無人知曉，僅知其風姿綽約，引人遐思。",
+  "changes": [
+    { "original": "年紀", "polished": "芳齡" },
+    { "original": "樣子", "polished": "風姿" },
+    { "original": "美麗", "polished": "綽約" }
+  ]
+}`;
+        try {
+             const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+                body: JSON.stringify({
+                    model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                    messages: [{ role: "user", content: systemPrompt }],
+                    response_format: { type: "json_object" },
+                    max_tokens: 4096,
+                    temperature: 0.7
+                })
+            });
+            if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+            const data = await response.json();
+            const content = JSON.parse(data.choices?.[0]?.message?.content);
+
+            if (!content || !content.polishedText || !Array.isArray(content.changes)) {
+                 throw new Error("API 未返回有效的潤色內容或格式錯誤。");
+            }
+
+            return {
+                type: 'polish',
+                vocab: '潤色結果',
+                originalText: text,
+                polishedText: content.polishedText,
+                changes: content.changes,
+                generatedDate: new Date().toISOString()
+            };
+
+        } catch (error) {
+            console.error("API Error (Polish):", error);
+            showError(`潤色失敗: ${error.message}`);
+            return null;
+        }
+    }
+
+    async function fetchVocabulary(options) {
+        const { mode, query, difficulty, count, topic } = options;
+        let systemPrompt;
+        
+        const jsonFormatInstruction = `{
+  "results": [
+    {
+      "vocab": "詞彙",
+      "stroke_count": 詞彙【首字】的筆劃數,
+      "definition": "對該詞彙的精闢中文解釋",
+      "examples": [
+        "來自真實中文文學作品的例句一",
+        "來自真實中文文學作品的例句二",
+        "來自真實中文文學作品的例句三",
+        "來自真實中文文學作品的例句四",
+        "來自真實中文文學作品的例句五"
+      ]
+    }
+  ]
+}`;
+
+        if (mode === 'lookup') {
+            systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是為使用者提供的特定詞彙，提供詳細的解釋和文學例句。
+使用者指定的詞彙: "${query}"
+
+重要指示:
+1.  你必須提供該詞彙的精確解釋。
+2.  你必須提供該詞彙【首字】的筆劃數。
+3.  你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+4.  你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+5.  所有文字都必須是繁體中文。
+
+JSON 格式:
+${jsonFormatInstruction}`;
+        } else { // generate mode
+            const topicInstruction = topic ? `請圍繞「${topic}」這個主題來發想。` : '請隨機選擇主題。';
+            const historyVocabs = state.history.slice(0, 20).map(item => item.vocab).join(', ');
+
+            systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的詞彙。
+使用者設定:
+- 難度（1-5顆星）: ${difficulty}
+- 生成數量: ${count}
+- 主題偏好: ${topicInstruction}
+
+重要指示:
+1.  生成的詞彙應該符合指定的難度，難度越高，詞彙應該越冷僻或專業。
+2.  為每個生成的詞彙提供精確的解釋、其【首字】的筆劃數，以及五句文學例句。
+3.  每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+4.  生成的詞彙【絕對不能】重複。請避免生成以下最近使用過的詞彙：${historyVocabs}。
+5.  你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+6.  所有文字都必須是繁體中文。
+7.  為了確保每次都能生成全新的內容，請將此唯一請求 ID 納入考量：${Date.now()}。
+
+JSON 格式 (results 陣列中應有 ${count} 個物件):
+${jsonFormatInstruction}`;
+        }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+                body: JSON.stringify({
+                    model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                    messages: [{ role: "user", content: systemPrompt }],
+                    response_format: { type: "json_object" },
+                    max_tokens: 4096,
+                    temperature: 0.8
+                })
+            });
+
+            if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+            const data = await response.json();
+            if (!data.choices?.[0]?.message?.content) throw new Error("API 回應格式不正確。");
+            const parsedData = JSON.parse(data.choices[0].message.content);
+            
+            if (!parsedData.results || !Array.isArray(parsedData.results) || parsedData.results.length === 0) {
+                throw new Error("API 回應的 JSON 內容不完整或格式錯誤。");
+            }
+
+            parsedData.results.forEach(item => {
+                if (!item.vocab || !item.definition || !item.examples || item.examples.length < 5) {
+                    throw new Error(`詞彙 "${item.vocab || '未知'}" 的資料不完整。`);
+                }
+                item.type = 'vocab'; // Differentiate from 'polish'
+                item.generatedDate = new Date().toISOString();
+                item.id = `${item.vocab}-${item.generatedDate}`;
+            });
+
+            return parsedData.results;
+        } catch(error) {
+            console.error("API Error (Vocab):", error);
+            if (error instanceof SyntaxError) showError("API 回傳格式錯誤，無法解析。請重試。");
+            else showError(`獲取資料時發生錯誤: ${error.message}`);
+            return null;
+        }
+    }
+
+    function addToHistory(results) {
+        if (!results || results.some(r => r.type !== 'vocab')) return;
+        const newVocabs = results.map(r => r.vocab);
+        state.history = state.history.filter(item => !newVocabs.includes(item.vocab));
+        state.history.unshift(...results);
+        if (state.history.length > 100) {
+             state.history = state.history.slice(0, 100);
+        }
+        localStorage.setItem('vocabHistory_v2', JSON.stringify(state.history));
+    }
+
+    function switchToReaderView() {
+        settingsSection.classList.add('hidden');
+        readingSection.classList.remove('hidden');
+        if (!body.classList.contains('fullscreen-mode')) {
+             toggleFullscreen();
+        }
+    }
+
+    function switchToSettingsView() {
+        readingSection.classList.add('hidden');
+        settingsSection.classList.remove('hidden');
+        state.currentResults = null;
+        state.totalPages = 0;
+        updatePaginationDisplay();
+    }
+
+    function toggleFullscreen() { 
+        body.classList.toggle('fullscreen-mode');
+        setTimeout(() => {
+            if (state.currentResults) {
+                displayResultsAsBook(state.currentResults);
+            }
+        }, 100);
+    }
+
+    function changeFontSize(amount) {
+        const newSize = Math.max(0.8, Math.min(1.8, state.fontSize + amount));
+        state.fontSize = Math.round(newSize * 10) / 10;
+        localStorage.setItem('fontSize', state.fontSize);
+        root.style.setProperty('--reader-font-size', `${state.fontSize}rem`);
+        if (state.currentResults) {
+            displayResultsAsBook(state.currentResults);
+        }
+    }
+
+    // --- 6. 詞彙顯示與翻頁 ---
+    function displayResultsAsBook(results) {
+        const currentPageBeforeRepagination = state.currentPageNum;
+        book.innerHTML = '';
+        book.style.transition = 'none';
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function applyHighlights(text, changes, type) {
+            if (!changes || changes.length === 0) return text;
+            let highlightedText = text;
+            
+            changes.forEach(change => {
+                const wordToFind = type === 'original' ? change.original : change.polished;
+                const className = type === 'original' ? 'mark-original' : 'mark-polished';
+                const dataAttr = type === 'polished' ? `data-word="${change.polished}"` : '';
+
+                // Regex to avoid replacing text inside existing HTML tags
+                const regex = new RegExp(escapeRegExp(wordToFind) + '(?![^<]*>)', 'g');
+                highlightedText = highlightedText.replace(regex, `<mark class="${className}" ${dataAttr}>${wordToFind}</mark>`);
+            });
+            return highlightedText;
+        }
+
+        setTimeout(() => {
+            if (!bookContainer.clientWidth) return;
+            state.totalPages = results.length;
+
+            results.forEach((item, resultIndex) => {
+                const pageElement = document.createElement('div');
+                pageElement.className = 'page';
+                let contentHTML = '';
+
+                if (item.type === 'polish') {
+                    const originalParas = item.originalText.split('\n').filter(p => p.trim() !== '');
+                    const polishedParas = item.polishedText.split('\n').filter(p => p.trim() !== '');
+                    const loopCount = Math.max(originalParas.length, polishedParas.length);
+                    
+                    let comparisonHTML = '';
+                    for (let i = 0; i < loopCount; i++) {
+                        const originalP = originalParas[i] || '';
+                        const polishedP = polishedParas[i] || '';
+
+                        const highlightedOriginalP = applyHighlights(originalP, item.changes, 'original');
+                        const highlightedPolishedP = applyHighlights(polishedP, item.changes, 'polished');
+
+                        comparisonHTML += `
+                            <div class="comparison-pair">
+                                <div>
+                                    <div class="para-marker">原文段落 ${i + 1}</div>
+                                    <div class="original-para">${highlightedOriginalP.trim() ? highlightedOriginalP : '&nbsp;'}</div>
+                                </div>
+                                <div>
+                                    <div class="para-marker">潤色後段落 ${i + 1}</div>
+                                    <div class="polished-para">${highlightedPolishedP.trim() ? highlightedPolishedP : '&nbsp;'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    const highlightedFullText = applyHighlights(item.polishedText, item.changes, 'polished');
+
+                    contentHTML = `
+                        <div class="polish-view-switcher">
+                            <button class="polish-view-btn active" data-view="full-text-${resultIndex}">閱覽潤色全文</button>
+                            <button class="polish-view-btn" data-view="comparison-${resultIndex}">逐段比對</button>
+                        </div>
+                        
+                        <div id="full-text-${resultIndex}">
+                             <div class="polished-text-content">${highlightedFullText}</div>
+                        </div>
+
+                        <div id="comparison-${resultIndex}" class="hidden">
+                             <div class="comparison-container">${comparisonHTML}</div>
+                        </div>
+                    `;
+                } else {
+                    const examplesHTML = item.examples.map(ex => `<li>${ex}</li>`).join('');
+                    contentHTML = `
+                        <h2 class="vocab-header">${item.vocab}</h2>
+                        <div class="vocab-definition-container">
+                           <p class="vocab-definition">${item.definition}</p>
+                        </div>
+                        <ul class="vocab-examples">${examplesHTML}</ul>
+                    `;
+                }
+                
+                pageElement.innerHTML = `<div class="page-content">${contentHTML}</div>`;
+                book.appendChild(pageElement);
+                
+                if (item.type === 'polish') {
+                    const switcher = pageElement.querySelector('.polish-view-switcher');
+                    switcher.addEventListener('click', (e) => {
+                        if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('active')) {
+                            switcher.querySelectorAll('.polish-view-btn').forEach(btn => btn.classList.remove('active'));
+                            e.target.classList.add('active');
+                            const viewToShow = e.target.dataset.view;
+                            const pageContent = e.target.closest('.page-content');
+                            const fullTextView = pageContent.querySelector(`[id^="full-text-"]`);
+                            const comparisonView = pageContent.querySelector(`[id^="comparison-"]`);
+
+                            fullTextView.classList.toggle('hidden', !viewToShow.startsWith('full-text'));
+                            comparisonView.classList.toggle('hidden', !viewToShow.startsWith('comparison'));
+                        }
+                    });
+                }
+            });
+
+            const newPage = Math.min(currentPageBeforeRepagination, state.totalPages - 1);
+            goToPage(newPage, true);
+
+        }, 50);
+    }
+    
+    function goToPage(pageNum, immediate = false) {
+        if (state.totalPages === 0) return;
+        const pageIndex = Math.max(0, Math.min(pageNum, state.totalPages - 1));
+        state.currentPageNum = pageIndex;
+        currentTranslate = -pageIndex * bookContainer.clientWidth;
+        book.style.transition = immediate ? 'none' : 'transform 0.4s ease-out';
+        book.style.transform = `translateX(${currentTranslate}px)`;
+        updatePaginationDisplay();
+    }
+
+    function updatePaginationDisplay() {
+        if (readerPagination) {
+            if (state.totalPages > 1) {
+                readerPagination.textContent = `${state.currentPageNum + 1} / ${state.totalPages}`;
+            } else {
+                readerPagination.textContent = '';
+            }
+        }
+    }
+
+    // --- 7. 翻頁與互動處理 ---
+    function dragStart(e) { if(state.totalPages <= 1) return; isDragging = true; dragStartX = e.touches ? e.touches[0].clientX : e.clientX; startTranslate = currentTranslate; book.style.transition = 'none'; }
+    function dragMove(e) { if (!isDragging) return; const currentX = e.touches ? e.touches[0].clientX : e.clientX; const diff = currentX - dragStartX; currentTranslate = startTranslate + diff; book.style.transform = `translateX(${currentTranslate}px)`; }
+    function dragEnd() { if (!isDragging) return; isDragging = false; const threshold = bookContainer.clientWidth / 5; const endTranslate = -state.currentPageNum * bookContainer.clientWidth; const movedBy = currentTranslate - endTranslate; if (movedBy < -threshold && state.currentPageNum < state.totalPages - 1) { goToPage(state.currentPageNum + 1); } else if (movedBy > threshold && state.currentPageNum > 0) { goToPage(state.currentPageNum - 1); } else { goToPage(state.currentPageNum); } }
+    
+    async function handlePolishedWordClick(e) {
+        const target = e.target;
+        if (target.classList.contains('mark-polished') && target.dataset.word) {
+            const word = target.dataset.word;
+            
+            showToast(`正在為「${word}」生成解釋...`, 'info');
+            
+            try {
+                const results = await fetchVocabulary({ mode: 'lookup', query: word });
+                if (results && results.length > 0) {
+                    addToHistory(results);
+                    showToast(`「${word}」已成功加入閱讀紀錄`, 'success');
+                } else {
+                    throw new Error("找不到該詞彙的解釋。");
+                }
+            } catch (error) {
+                console.error('Error fetching explanation for clicked word:', error);
+                showToast(`無法為「${word}」生成解釋`, 'error');
+            }
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const existingToast = document.querySelector('.vocab-toast');
+        if (existingToast) existingToast.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'vocab-toast';
+        toast.textContent = message;
+        
+        if (type === 'success') toast.style.backgroundColor = '#27ae60';
+        else if (type === 'error') toast.style.backgroundColor = '#c0392b';
+        
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000);
+    }
+
+    // --- 8. 歷史紀錄相關函式 ---
+    function showHistory() { renderHistory(); historyModal.classList.add('is-visible'); }
+    function hideHistory() { historyModal.classList.remove('is-visible'); }
+
+    function deleteAllHistory() {
+        if (state.history.length === 0) return;
+        if (confirm('您確定要刪除所有閱讀紀錄嗎？此操作無法復原。')) {
+            state.history = [];
+            localStorage.setItem('vocabHistory_v2', '[]');
+            renderHistory();
+        }
+    }
+
+    function renderHistory() {
+        let items = [...state.history];
+        const term = historySearch.value;
+        if (term) {
+            const strokeCount = parseInt(term);
+            if (!isNaN(strokeCount)) {
+                items = items.filter(i => i.stroke_count === strokeCount);
+            }
+        }
+
+        items.sort((a, b) => {
+            switch (historySort.value) {
+                case 'date_asc': return new Date(a.generatedDate) - new Date(b.generatedDate);
+                case 'stroke_asc': return (a.stroke_count || 99) - (b.stroke_count || 99);
+                case 'stroke_desc': return (b.stroke_count || 0) - (a.stroke_count || 0);
+                default: return new Date(b.generatedDate) - new Date(a.generatedDate);
+            }
+        });
+
+        historyList.innerHTML = items.length === 0 
+            ? `<li class="no-history-msg">${term ? '找不到符合條件的紀錄。' : '目前沒有閱讀紀錄。'}</li>`
+            : items.map((item, index) => `
+                <li data-history-id="${item.id}" data-vocab="${item.vocab}">
+                    <div class="history-item-content">
+                        <div class="history-list-item-title">${index + 1}. ${item.vocab}</div>
+                        <div class="history-list-item-meta">
+                            ${item.stroke_count ? ` ${item.stroke_count}劃` : '無筆劃資訊'} - ${new Date(item.generatedDate).toLocaleDateString('zh-TW')}
+                        </div>
+                    </div>
+                    <div class="history-item-actions">
+                        <button class="icon-btn regenerate-history-btn" title="重新生成此詞彙的解釋與例句">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8h-6V2l2.25 2.25A12.012 12.012 0 0 0 12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 9-4.25 9-4.25"/></svg>
+                        </button>
+                        <button class="icon-btn delete-history-btn" title="刪除此紀錄">
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                    </div>
+                </li>`).join('');
+    }
+    
+    async function regenerateHistoryItem(id, vocab, element) {
+        element.classList.add('is-loading');
+        try {
+            const results = await fetchVocabulary({ mode: 'lookup', query: vocab });
+            if (results && results.length > 0) {
+                const newItem = results[0];
+                const index = state.history.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    state.history[index] = newItem;
+                    localStorage.setItem('vocabHistory_v2', JSON.stringify(state.history));
+                    renderHistory();
+                }
+            }
+        } catch(error) {
+            showError(`重新生成失敗: ${error.message}`);
+            element.classList.remove('is-loading');
+        }
+    }
+
+    function handleHistoryListClick(e) {
+        const li = e.target.closest('li[data-history-id]');
+        if (!li) return;
+
+        const id = li.dataset.historyId;
+        const vocab = li.dataset.vocab;
+
+        if (e.target.closest('.regenerate-history-btn')) {
+            if (confirm(`您確定要重新生成「${vocab}」的解釋與例句嗎？這將會覆蓋現有紀錄。`)) {
+                regenerateHistoryItem(id, vocab, li);
+            }
+            return;
+        }
+
+        if (e.target.closest('.delete-history-btn')) {
+            if (confirm(`您確定要刪除「${vocab}」這筆紀錄嗎？`)) {
+                state.history = state.history.filter(item => item.id !== id);
+                localStorage.setItem('vocabHistory_v2', JSON.stringify(state.history));
+                renderHistory();
+            }
+            return;
+        }
+
+        if (e.target.closest('.history-item-content')) {
+            const item = state.history.find(i => i.id === id);
+            if (item) {
+                state.currentResults = [item];
+                state.currentPageNum = 0;
+                displayResultsAsBook(state.currentResults);
+                switchToReaderView();
+                hideHistory();
+            }
+        }
+    }
+}
+
+// --- Initialize app on page load ---
+document.addEventListener('DOMContentLoaded', initializeApp);
+</script>
+</body>
+</html>
