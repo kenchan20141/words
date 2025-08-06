@@ -505,6 +505,20 @@ mark.mark-polished {
     bottom: 30px;
 }
 
+/* --- 13. [NEW] 潤色模式擴充 (Polish Mode Extensions) --- */
+.full-text-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    height: 36px;
+}
+
+.copy-full-text-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
 </style>
 </head>
 <body class="light-mode">
@@ -803,7 +817,7 @@ function initializeApp() {
     document.addEventListener('mouseup', dragEnd);
     document.addEventListener('touchend', dragEnd);
     
-    readingSection.addEventListener('click', handlePolishedWordClick);
+    readingSection.addEventListener('click', handleReaderClick);
 
 
     // --- 5. 核心功能函式 ---
@@ -1205,6 +1219,7 @@ ${jsonFormatInstruction}`;
                     }
                     
                     const highlightedFullText = applyHighlights(item.polishedText, item.changes, 'polished');
+                    const encodedPolishedText = item.polishedText.replace(/"/g, '&quot;');
 
                     contentHTML = `
                         <div class="polish-view-switcher">
@@ -1213,6 +1228,11 @@ ${jsonFormatInstruction}`;
                         </div>
                         
                         <div id="full-text-${resultIndex}">
+                             <div class="full-text-header">
+                                 <button class="icon-btn copy-full-text-btn" title="一鍵複製全文" data-text-to-copy="${encodedPolishedText}">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                 </button>
+                             </div>
                              <div class="polished-text-content">${highlightedFullText}</div>
                         </div>
 
@@ -1283,11 +1303,13 @@ ${jsonFormatInstruction}`;
     function dragMove(e) { if (!isDragging) return; const currentX = e.touches ? e.touches[0].clientX : e.clientX; const diff = currentX - dragStartX; currentTranslate = startTranslate + diff; book.style.transform = `translateX(${currentTranslate}px)`; }
     function dragEnd() { if (!isDragging) return; isDragging = false; const threshold = bookContainer.clientWidth / 5; const endTranslate = -state.currentPageNum * bookContainer.clientWidth; const movedBy = currentTranslate - endTranslate; if (movedBy < -threshold && state.currentPageNum < state.totalPages - 1) { goToPage(state.currentPageNum + 1); } else if (movedBy > threshold && state.currentPageNum > 0) { goToPage(state.currentPageNum - 1); } else { goToPage(state.currentPageNum); } }
     
-    async function handlePolishedWordClick(e) {
+    async function handleReaderClick(e) {
         const target = e.target;
-        if (target.classList.contains('mark-polished') && target.dataset.word) {
-            const word = target.dataset.word;
-            
+
+        // Logic for clicking a polished word
+        const polishedWordMark = target.closest('mark.mark-polished');
+        if (polishedWordMark && polishedWordMark.dataset.word) {
+            const word = polishedWordMark.dataset.word;
             showToast(`正在為「${word}」生成解釋...`, 'info');
             
             try {
@@ -1302,8 +1324,25 @@ ${jsonFormatInstruction}`;
                 console.error('Error fetching explanation for clicked word:', error);
                 showToast(`無法為「${word}」生成解釋`, 'error');
             }
+            return;
+        }
+
+        // Logic for clicking the copy button
+        const copyBtn = target.closest('.copy-full-text-btn');
+        if (copyBtn) {
+            e.preventDefault();
+            const textToCopy = copyBtn.dataset.textToCopy;
+            if (textToCopy) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast('已複製到剪貼簿', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showToast('複製失敗，瀏覽器不支援或未授權', 'error');
+                });
+            }
         }
     }
+
 
     function showToast(message, type = 'info') {
         const existingToast = document.querySelector('.vocab-toast');
