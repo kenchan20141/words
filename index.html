@@ -113,7 +113,8 @@ body.dark-mode {
 
 /* Mode Switcher */
 .mode-switcher {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 將容器改為 2x2 的網格佈局 */
     justify-content: center;
     margin-bottom: 2rem;
     border-bottom: 1px solid;
