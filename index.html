@@ -157,7 +157,7 @@ body.dark-mode {
 .form-group label { display: block; margin-bottom: 0.75rem; font-weight: 500; font-size: 1.1rem; }
 
 /* General input styles */
-input[type="text"], textarea, select {
+input[type="text"], input[type="search"], textarea, select {
     width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 0px; /* More minimalist */
@@ -168,17 +168,17 @@ input[type="text"], textarea, select {
     transition: background-color 0.4s, color 0.4s, border-color 0.4s;
     -webkit-appearance: none; -moz-appearance: none; appearance: none;
 }
-.light-mode input[type="text"], .light-mode textarea, .light-mode select {
+.light-mode input[type="text"], .light-mode input[type="search"], .light-mode textarea, .light-mode select {
     background-color: transparent;
     border-color: var(--border-color-light);
     color: var(--text-primary-light);
 }
-.dark-mode input[type="text"], .dark-mode textarea, .dark-mode select {
+.dark-mode input[type="text"], .dark-mode input[type="search"], .dark-mode textarea, .dark-mode select {
     background-color: var(--bg-color-dark);
     border-color: var(--border-color-dark);
     color: var(--text-primary-dark);
 }
-input[type="text"]:focus, textarea:focus, select:focus {
+input[type="text"]:focus, input[type="search"]:focus, textarea:focus, select:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 2px rgba(163, 155, 139, 0.3);
@@ -338,12 +338,39 @@ body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
 .light-mode .history-header { border-color: var(--border-color-light); }
 .dark-mode .history-header { border-color: var(--border-color-dark); }
 .history-header h2 { font-size: 1.5rem; font-weight: 500; }
+
+/* [NEW] History Tab Switcher */
+.history-tab-switcher {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid;
+    margin-bottom: 1rem;
+}
+.light-mode .history-tab-switcher { border-color: var(--border-color-light); }
+.dark-mode .history-tab-switcher { border-color: var(--border-color-dark); }
+.history-tab-btn {
+    font-family: var(--font-sans); font-size: 1rem; font-weight: 500;
+    padding: 0.75rem 1.25rem; border: none; background-color: transparent;
+    cursor: pointer; position: relative; transition: color 0.3s;
+}
+.light-mode .history-tab-btn { color: var(--text-secondary-light); }
+.dark-mode .history-tab-btn { color: var(--text-secondary-dark); }
+.light-mode .history-tab-btn.active { color: var(--text-primary-light); }
+.dark-mode .history-tab-btn.active { color: var(--text-primary-dark); }
+.history-tab-btn::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px;
+    background-color: var(--accent-color); transform: scaleX(0); transition: transform 0.3s ease-out;
+}
+.history-tab-btn.active::after { transform: scaleX(1); }
+
+
 .history-controls { display: flex; gap: 1rem; margin-bottom: 1rem; }
 #history-search { flex-grow: 1; padding: 0.5rem 0.75rem; font-size: 1rem; font-family: var(--font-sans); border-radius: 0; }
 #history-sort { padding: 0.5rem; font-size: 1rem; font-family: var(--font-sans); border-radius: 0; }
 .light-mode #history-search, .light-mode #history-sort { background-color: var(--bg-color-light); border: 1px solid var(--border-color-light); color: var(--text-primary-light); }
 .dark-mode #history-search, .dark-mode #history-sort { background-color: var(--bg-color-dark); border: 1px solid var(--border-color-dark); color: var(--text-primary-dark); }
 #history-search:focus, #history-sort:focus { outline: none; border-color: var(--accent-color); }
+
 .history-list { list-style: none; overflow-y: auto; flex-grow: 1; }
 .history-list li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 1rem; transition: background-color 0.2s; border-bottom: 1px solid; }
 .history-list li.is-loading { opacity: 0.5; pointer-events: none; }
@@ -353,16 +380,17 @@ body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
 .history-list-item-meta { font-family: var(--font-sans); font-size: 0.9rem; margin-top: 0.25rem; }
 .light-mode .history-list li { border-color: var(--border-color-light); }
 .dark-mode .history-list li { border-color: var(--border-color-dark); }
-.light-mode .history-item-content:hover { background-color: var(--bg-color-light); }
-.dark-mode .history-item-content:hover { background-color: var(--bg-color-dark); }
+.light-mode .history-list li:hover { background-color: rgba(0,0,0,0.03); }
+.dark-mode .history-list li:hover { background-color: rgba(255,255,255,0.05); }
 .light-mode .history-list-item-meta { color: var(--text-secondary-light); }
 .dark-mode .history-list-item-meta { color: var(--text-secondary-dark); }
 .history-item-actions { display: flex; align-items: center; gap: 0.25rem; }
 .history-item-actions .icon-btn svg { width: 20px; height: 20px; }
 .light-mode .delete-history-btn:hover svg, .light-mode #delete-all-history-btn:hover svg { stroke: #e74c3c; }
 .dark-mode .delete-history-btn:hover svg, .dark-mode #delete-all-history-btn:hover svg { stroke: #e74c3c; }
-.light-mode .regenerate-history-btn:hover svg { stroke: var(--accent-color-hover); }
-.dark-mode .regenerate-history-btn:hover svg { stroke: var(--accent-color-hover); }
+/* [REVISION] Style for edit and regenerate buttons */
+.light-mode .edit-history-title-btn:hover svg, .light-mode .regenerate-history-btn:hover svg { stroke: var(--accent-color-hover); }
+.dark-mode .edit-history-title-btn:hover svg, .dark-mode .regenerate-history-btn:hover svg { stroke: var(--accent-color-hover); }
 
 .no-history-msg { padding: 2rem; text-align: center; justify-content: center; }
 .light-mode .no-history-msg { color: var(--text-secondary-light); }
@@ -434,6 +462,12 @@ body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
     grid-template-columns: 1fr; 
     gap: 1.5rem;
 }
+@media (min-width: 768px) {
+    .comparison-pair {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
 
 .original-para, .polished-para {
     padding: 1rem 1.5rem;
@@ -546,7 +580,7 @@ mark.mark-polished {
             <p>煉字琢句——對思想最大的忠誠。</p>
         </div>
         <div class="header-controls">
-            <button class="icon-btn" id="history-btn" title="詞彙表">
+            <button class="icon-btn" id="history-btn" title="查看紀錄">
                 <!-- Book Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20v2H6.5A2.5 2.5 0 0 1 4 19.5z"></path><path d="M4 5h16v12H6.5A2.5 2.5 0 0 1 4 14.5V5zM7 7v2m3-2v2"></path></svg>
             </button>
@@ -674,36 +708,42 @@ mark.mark-polished {
 </div>
 </div>
 
-<!-- 歷史紀錄彈出層 (Modal) -->
+<!-- [REVISED] 歷史紀錄彈出層 (Modal) -->
 <div class="history-modal" id="history-modal">
 <div class="history-container">
     <div class="history-header">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <h2>詞彙表</h2>
-            <button class="icon-btn" id="delete-all-history-btn" title="刪除全部紀錄">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
+            <h2 id="history-title">紀錄中心</h2>
         </div>
         <button class="icon-btn" id="history-close-btn" title="關閉">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
     </div>
+
+    <div class="history-tab-switcher">
+        <button class="history-tab-btn active" data-history-type="lookup">詞彙表</button>
+        <button class="history-tab-btn" data-history-type="polishing">潤色紀錄</button>
+    </div>
+
     <div class="history-controls">
-        <input type="number" id="history-search" placeholder="按首字筆劃數搜尋...">
-        <select id="history-sort">
-            <option value="date_desc">按生成日期 (新到舊)</option>
-            <option value="date_asc">按生成日期 (舊到新)</option>
-            <option value="stroke_asc">按首字筆劃 (少到多)</option>
-            <option value="stroke_desc">按首字筆劃 (多到少)</option>
-        </select>
+        <input type="search" id="history-search" placeholder="按詞彙搜尋...">
+        <select id="history-sort"></select> <!-- Options will be populated by JS -->
     </div>
     <ul class="history-list" id="history-list"></ul>
+    <div class="history-footer" style="padding-top: 1rem; text-align: right;">
+        <button class="icon-btn" id="delete-all-history-btn" title="刪除此分頁的所有紀錄">
+             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+    </div>
 </div>
 </div>
+
 
 <footer class="copyright-footer">
 <p>Copyright © 2025 陳冠健. All rights reserved.</p>
 </footer>
+
+<div class="vocab-toast" id="vocab-toast"></div>
 
 <script>
 // --- Main application logic ---
@@ -746,18 +786,21 @@ function initializeApp() {
     const fontSizeDecreaseBtn = document.getElementById('font-size-decrease-btn');
     const readerPagination = document.getElementById('reader-pagination');
 
-    // History
+    // [REVISED] History
     const historyBtn = document.getElementById('history-btn');
     const historyModal = document.getElementById('history-modal');
     const historyCloseBtn = document.getElementById('history-close-btn');
+    const historyTitle = document.getElementById('history-title');
+    const historyTabBtns = document.querySelectorAll('.history-tab-btn');
     const historyList = document.getElementById('history-list');
     const historySearch = document.getElementById('history-search');
     const historySort = document.getElementById('history-sort');
     const deleteAllHistoryBtn = document.getElementById('delete-all-history-btn');
+    const vocabToast = document.getElementById('vocab-toast');
 
     // --- API 配置 ---
     const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
-    const API_KEY = "sk-GruTbLTbtSeWof3rEBjtIg"; // 自動填入的 API Key
+    const API_KEY = "sk-GruTbLTbtSeWof3rEBjtIg"; 
 
     // --- 2. 狀態管理 ---
     let state = {
@@ -765,7 +808,9 @@ function initializeApp() {
         generateDifficulty: 3,
         wordPolishDifficulty: 3,
         prosePolishDifficulty: 3,
-        history: JSON.parse(localStorage.getItem('vocabHistory_v2')) || [],
+        lookupHistory: JSON.parse(localStorage.getItem('vocabHistory_v3')) || [],
+        polishingHistory: JSON.parse(localStorage.getItem('polishingHistory_v1')) || [],
+        activeHistoryTab: 'lookup', // 'lookup' or 'polishing'
         currentResults: null,
         currentPageNum: 0,
         totalPages: 0,
@@ -833,7 +878,7 @@ function initializeApp() {
     
     fullscreenBtn.addEventListener('click', toggleFullscreen);
     backToSettingsBtn.addEventListener('click', () => {
-        if (document.fullscreenElement || body.classList.contains('fullscreen-mode')) {
+        if (body.classList.contains('fullscreen-mode')) {
             toggleFullscreen();
         }
         switchToSettingsView();
@@ -842,13 +887,15 @@ function initializeApp() {
     fontSizeIncreaseBtn.addEventListener('click', () => changeFontSize(0.1));
     fontSizeDecreaseBtn.addEventListener('click', () => changeFontSize(-0.1));
 
+    // [REVISED] History Event Listeners
     historyBtn.addEventListener('click', showHistory);
     historyCloseBtn.addEventListener('click', hideHistory);
-    deleteAllHistoryBtn.addEventListener('click', deleteAllHistory);
+    deleteAllHistoryBtn.addEventListener('click', deleteAllHistoryForCurrentTab);
     historyModal.addEventListener('click', (e) => { if (e.target === historyModal) hideHistory(); });
     historyList.addEventListener('click', handleHistoryListClick);
     historySearch.addEventListener('input', renderHistory);
     historySort.addEventListener('change', renderHistory);
+    historyTabBtns.forEach(btn => btn.addEventListener('click', switchHistoryTab));
     
     bookContainer.addEventListener('mousedown', dragStart);
     bookContainer.addEventListener('touchstart', dragStart, { passive: true });
@@ -907,7 +954,7 @@ function initializeApp() {
             btnText = '開始潤色';
         } else if (newMode === 'prose-polish'){
             prosePolishForm.classList.remove('hidden');
-            btnText = '開始潤色';
+            btnText = '開始重寫';
         }
         submitBtnText.textContent = btnText;
         errorMessage.style.display = 'none';
@@ -948,6 +995,7 @@ function initializeApp() {
                 setLoading(true, '潤色中...');
                 const result = await fetchWordPolishedText(text, state.wordPolishDifficulty);
                 if (result) {
+                    addToPolishingHistory(result);
                     state.currentResults = [result];
                     state.currentPageNum = 0;
                     displayResultsAsBook(state.currentResults);
@@ -962,6 +1010,7 @@ function initializeApp() {
                 setLoading(true, '潤色中...');
                 const result = await fetchProsePolishedText(text, state.prosePolishDifficulty);
                 if (result) {
+                    addToPolishingHistory(result);
                     state.currentResults = [result];
                     state.currentPageNum = 0;
                     displayResultsAsBook(state.currentResults);
@@ -989,8 +1038,8 @@ function initializeApp() {
                 
                 const results = await fetchVocabulary(options);
                 if (results && results.length > 0) {
+                    addToLookupHistory(results);
                     state.currentResults = results;
-                    addToHistory(results);
                     state.currentPageNum = 0;
                     displayResultsAsBook(results);
                     switchToReaderView();
@@ -1004,8 +1053,8 @@ function initializeApp() {
         }
     }
     
-    // [REVISED] This function is updated to fix the paragraph mismatch bug.
     async function fetchProsePolishedText(text, difficulty) {
+        // [REVISION 3] Updated prompt for paired highlighting
         const systemPrompt = `你是一位專業的中文文學編輯，擅長將平實的文字改寫得更具文采和深度。
 你的任務是根據使用者提供的文本，進行「文句潤色」，並將原文與潤色後的文句進行配對。
 
@@ -1016,13 +1065,13 @@ function initializeApp() {
     - 如果一個段落被潤色，則一對一配對。
     - 如果原文中的【多個連續段落】被合併為一個，將它們（在 "original" 欄位中用 \\n 分隔）配對到【一個】潤色後的段落。
     - 如果原文中的一個段落被拆分為多個，將它配對到【多個】潤色後的段落（在 "polished" 欄位中用 \\n 分隔）。
-4.  【標示改動】：在潤色後的段落("polished" 欄位)中，用 \`<mark class="mark-polished">\` 標籤包裹你認為最關鍵、最能體現潤色效果的【完整句子】。
+4.  【標示改動】：在潤色後的段落("polished" 欄位)中，用 \`<mark class="mark-polished">\` 標籤包裹你認為最關鍵、最能體現潤色效果的【一個或多個完整句子】。然後，在對應的原文段落("original" 欄位)中，找到這些句子【改寫前】的樣貌，並用 \`<mark class="mark-original">\` 標籤包裹它們。這兩組標籤應形成一對一的參照。
 5.  【JSON 格式輸出】：你的回傳內容【必須】是單一的 JSON 物件，不含任何 markdown 語法。所有文字都必須是繁體中文。
 6.  為了確保每次都能生成全新的潤色結果，請將此唯一請求 ID 納入考量：${Date.now()}。
 
 JSON 物件必須包含一個 "comparison" key，其值為一個物件陣列。每個物件代表一個配對，包含：
-a. "original": (string) 一個或多個原文段落，以 '\\n' 分隔。
-b. "polished": (string) 一個或多個對應的潤色後段落，以 '\\n' 分隔，並包含 \`<mark>\` 標籤。
+a. "original": (string) 一個或多個原文段落，以 '\\n' 分隔，並可能包含 \`<mark class="mark-original">\` 標籤。
+b. "polished": (string) 一個或多個對應的潤色後段落，以 '\\n' 分隔，並包含 \`<mark class="mark-polished">\` 標籤。
 
 風格等級：${difficulty}
 原文：
@@ -1034,12 +1083,12 @@ JSON 格式範例:
 {
   "comparison": [
     {
-      "original": "我今天走在公園裡。\\n看到一朵很美的花。",
-      "polished": "今日信步於公園，與一朵絕美之花不期而遇。<mark class=\\"mark-polished\\">暖陽輕撫其瓣，為之披上了一襲 shimmering 的華裳。</mark>"
+      "original": "我今天走在公園裡。\\n<mark class=\\"mark-original\\">看到一朵很美的花。</mark>",
+      "polished": "今日信步於公園，<mark class=\\"mark-polished\\">與一朵絕美之花不期而遇。</mark>"
     },
     {
-      "original": "我覺得很開心。",
-      "polished": "見此景，心中漾起一陣難以言喻的喜悅。"
+      "original": "<mark class=\\"mark-original\\">我覺得很開心。</mark>",
+      "polished": "<mark class=\\"mark-polished\\">見此景，心中漾起一陣難以言喻的喜悅。</mark>"
     }
   ]
 }`;
@@ -1063,28 +1112,15 @@ JSON 格式範例:
                  throw new Error("API 未返回有效的 comparison 陣列或格式錯誤。");
             }
             
-            const originalText = content.comparison.map(p => p.original).join('\n\n');
             const polishedTextWithMarks = content.comparison.map(p => p.polished).join('\n\n');
             const polishedTextClean = polishedTextWithMarks.replace(/<mark.*?>/g, '').replace(/<\/mark>/g, '');
-    
-            // Extract polished words for the click-to-define feature
-            const changes = [];
-            const markRegex = /<mark.*?>(.*?)<\/mark>/g;
-            let match;
-            while ((match = markRegex.exec(polishedTextWithMarks)) !== null) {
-                changes.push({
-                    original: '', // Original mapping is complex, so we leave it blank
-                    polished: match[1]
-                });
-            }
 
             return {
                 type: 'prose-polish-result',
-                vocab: '文句潤色結果',
-                originalText: originalText,
-                polishedText: polishedTextClean, // Clean version for copy-to-clipboard
-                comparisonData: content.comparison, // New data structure for rendering
-                changes: changes, 
+                vocab: '文句潤色結果', // Default title, will be overridden later
+                originalText: text,
+                polishedText: polishedTextClean,
+                comparisonData: content.comparison,
                 generatedDate: new Date().toISOString()
             };
 
@@ -1148,7 +1184,7 @@ JSON 格式範例:
 
             return {
                 type: 'word-polish-result',
-                vocab: '詞語潤色結果',
+                vocab: '詞語潤色結果', // Default title, will be overridden later
                 originalText: text,
                 polishedText: content.polishedText,
                 changes: content.changes,
@@ -1166,11 +1202,11 @@ JSON 格式範例:
         const { mode, query, difficulty, count, topic } = options;
         let systemPrompt;
         
+        // [REVISION 2] Removed stroke_count from JSON instruction
         const jsonFormatInstruction = `{
   "results": [
     {
       "vocab": "詞彙",
-      "stroke_count": "詞彙【首字】的筆劃數",
       "definition": "對該詞彙的精闢中文解釋",
       "examples": [
         "來自真實中文文學作品的例句一",
@@ -1184,22 +1220,23 @@ JSON 格式範例:
 }`;
 
         if (mode === 'lookup') {
+            // [REVISION 2] Removed stroke_count from prompt instruction
             systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是為使用者提供的特定詞彙，提供詳細的解釋和文學例句。
 使用者指定的詞彙: "${query}"
 
 重要指示:
 1.  你必須提供該詞彙的精確解釋。
-2.  你必須提供該詞彙【首字】的筆劃數。
-3.  你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
-4.  你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
-5.  所有文字都必須是繁體中文。
+2.  你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+3.  你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+4.  所有文字都必須是繁體中文。
 
 JSON 格式:
 ${jsonFormatInstruction}`;
         } else { // generate mode
             const topicInstruction = topic ? `請圍繞「${topic}」這個主題來發想。` : '請隨機選擇主題。';
-            const historyVocabs = state.history.slice(0, 20).map(item => item.vocab).join(', ');
+            const historyVocabs = state.lookupHistory.slice(0, 20).map(item => item.vocab).join(', ');
 
+            // [REVISION 2] Removed stroke_count from prompt instruction
             systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的詞彙。
 使用者設定:
 - 難度（1-5顆星）: ${difficulty}
@@ -1208,7 +1245,7 @@ ${jsonFormatInstruction}`;
 
 重要指示:
 1.  生成的詞彙應該符合指定的難度，難度越高，詞彙應該越冷僻或專業。
-2.  為每個生成的詞彙提供精確的解釋、其【首字】的筆劃數，以及五句文學例句。
+2.  為每個生成的詞彙提供精確的解釋、以及五句文學例句。
 3.  每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
 4.  生成的詞彙【絕對不能】重複。請避免生成以下最近使用過的詞彙：${historyVocabs}。
 5.  你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
@@ -1247,7 +1284,7 @@ ${jsonFormatInstruction}`;
                 }
                 item.type = 'vocab'; // Differentiate from polish results
                 item.generatedDate = new Date().toISOString();
-                item.id = `${item.vocab}-${item.generatedDate}`;
+                item.id = item.generatedDate; // Use timestamp as a unique, stable ID
             });
 
             return parsedData.results;
@@ -1259,16 +1296,35 @@ ${jsonFormatInstruction}`;
         }
     }
 
-    function addToHistory(results) {
-        if (!results || results.some(r => r.type !== 'vocab')) return;
+    function addToLookupHistory(results) {
+        if (!results || !Array.isArray(results)) return;
         const newVocabs = results.map(r => r.vocab);
-        state.history = state.history.filter(item => !newVocabs.includes(item.vocab));
-        state.history.unshift(...results);
-        if (state.history.length > 100) {
-             state.history = state.history.slice(0, 100);
+        state.lookupHistory = state.lookupHistory.filter(item => !newVocabs.includes(item.vocab));
+        state.lookupHistory.unshift(...results);
+        if (state.lookupHistory.length > 100) {
+             state.lookupHistory = state.lookupHistory.slice(0, 100);
         }
-        localStorage.setItem('vocabHistory_v2', JSON.stringify(state.history));
+        localStorage.setItem('vocabHistory_v3', JSON.stringify(state.lookupHistory));
     }
+    
+    // [REVISED] Add to Polishing History
+    function addToPolishingHistory(result) {
+        if (!result) return;
+        // [REVISION 1] Do not prompt for a name on creation. Assign a default one.
+        // The title can be edited later from the history list.
+        const defaultTitle = `未命名篇章 ${new Date().toLocaleString('zh-TW', { hour12: false })}`;
+        result.title = defaultTitle;
+        result.id = result.generatedDate; // Use timestamp as a unique, stable ID.
+
+        state.polishingHistory.unshift(result);
+
+        if (state.polishingHistory.length > 50) { // Limit polishing history size
+            state.polishingHistory = state.polishingHistory.slice(0, 50);
+        }
+        localStorage.setItem('polishingHistory_v1', JSON.stringify(state.polishingHistory));
+        showToast('潤色結果已儲存', 'success');
+    }
+
 
     function switchToReaderView() {
         settingsSection.classList.add('hidden');
@@ -1288,6 +1344,7 @@ ${jsonFormatInstruction}`;
 
     function toggleFullscreen() { 
         body.classList.toggle('fullscreen-mode');
+        // Use a timeout to allow the layout to reflow before repaginating
         setTimeout(() => {
             if (state.currentResults) {
                 displayResultsAsBook(state.currentResults);
@@ -1306,7 +1363,6 @@ ${jsonFormatInstruction}`;
     }
 
     // --- 6. 結果顯示與翻頁 ---
-    // [REVISED] This function is updated to handle different polish types correctly.
     function displayResultsAsBook(results) {
         const currentPageBeforeRepagination = state.currentPageNum;
         book.innerHTML = '';
@@ -1323,11 +1379,10 @@ ${jsonFormatInstruction}`;
             changes.forEach(change => {
                 const wordToFind = type === 'original' ? change.original : change.polished;
                 const className = type === 'original' ? 'mark-original' : 'mark-polished';
-                const dataAttr = type === 'polished' ? `data-word="${change.polished}"` : '';
                 
                 if (highlightedText.includes(wordToFind)) {
                     const regex = new RegExp(escapeRegExp(wordToFind) + '(?![^<]*>)', 'g');
-                    highlightedText = highlightedText.replace(regex, `<mark class="${className}" ${dataAttr}>${wordToFind}</mark>`);
+                    highlightedText = highlightedText.replace(regex, `<mark class="${className}">${wordToFind}</mark>`);
                 }
             });
             return highlightedText;
@@ -1352,14 +1407,18 @@ ${jsonFormatInstruction}`;
                 const pageElement = document.createElement('div');
                 pageElement.className = 'page';
                 let contentHTML = '';
+                const pageTitle = item.title || item.vocab;
 
                 if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
-                    
-                    // [NEW] Specific logic for 'prose-polish' to fix the bug
+                     let comparisonHTML = '';
+                     let fullPolishedHtmlWithMarks = '';
+                     const encodedPolishedTextClean = escapeHtml(item.polishedText);
+
                     if (item.type === 'prose-polish-result') {
-                        const comparisonHTML = item.comparisonData.map((pair, i) => {
-                            const originalHTML = escapeHtml(pair.original);
-                            const polishedHTML = pair.polished; // Contains <mark> tags from API
+                        comparisonHTML = item.comparisonData.map((pair, i) => {
+                            // [REVISION 3] Do not escape originalHTML to allow <mark> tags
+                            const originalHTML = (pair.original || '').replace(/\n/g, '<br>');
+                            const polishedHTML = (pair.polished || '').replace(/\n/g, '<br>');
 
                             return `
                                 <div class="comparison-pair">
@@ -1375,38 +1434,18 @@ ${jsonFormatInstruction}`;
                             `;
                         }).join('');
 
-                        const fullPolishedHtmlWithMarks = item.comparisonData.map(p => p.polished).join('\n\n');
-                        const encodedPolishedTextClean = escapeHtml(item.polishedText); // Clean text for clipboard
+                        fullPolishedHtmlWithMarks = item.comparisonData.map(p => p.polished).join('\n\n');
 
-                        contentHTML = `
-                            <div class="view-switcher">
-                                <button class="view-btn active" data-view="full-text-${resultIndex}">閱覽全文</button>
-                                <button class="view-btn" data-view="comparison-${resultIndex}">逐段比對</button>
-                            </div>
-                            <div id="full-text-${resultIndex}">
-                                 <div class="full-text-header">
-                                     <button class="icon-btn copy-full-text-btn" title="一鍵複製全文" data-text-to-copy="${encodedPolishedTextClean}">
-                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                     </button>
-                                 </div>
-                                 <div class="polished-text-content">${fullPolishedHtmlWithMarks}</div>
-                            </div>
-                            <div id="comparison-${resultIndex}" class="hidden">
-                                 <div class="comparison-container">${comparisonHTML}</div>
-                            </div>
-                        `;
-
-                    } else { // Original logic for 'word-polish'
+                    } else { // 'word-polish'
                         const originalParas = item.originalText.split('\n').filter(p => p.trim() !== '');
                         const polishedParas = item.polishedText.split('\n').filter(p => p.trim() !== '');
                         const loopCount = Math.max(originalParas.length, polishedParas.length);
                         
-                        let comparisonHTML = '';
                         for (let i = 0; i < loopCount; i++) {
                             const originalP = originalParas[i] || '';
                             const polishedP = polishedParas[i] || '';
-                            const highlightedOriginalP = applyHighlights(originalP, item.changes, 'original');
-                            const highlightedPolishedP = applyHighlights(polishedP, item.changes, 'polished');
+                            const highlightedOriginalP = applyHighlights(escapeHtml(originalP), item.changes, 'original');
+                            const highlightedPolishedP = applyHighlights(escapeHtml(polishedP), item.changes, 'polished');
 
                             comparisonHTML += `
                                 <div class="comparison-pair">
@@ -1422,31 +1461,32 @@ ${jsonFormatInstruction}`;
                             `;
                         }
                         
-                        const highlightedFullText = applyHighlights(item.polishedText, item.changes, 'polished');
-                        const encodedPolishedText = escapeHtml(item.polishedText);
-
-                        contentHTML = `
-                            <div class="view-switcher">
-                                <button class="view-btn active" data-view="full-text-${resultIndex}">閱覽全文</button>
-                                <button class="view-btn" data-view="comparison-${resultIndex}">逐段比對</button>
-                            </div>
-                            <div id="full-text-${resultIndex}">
-                                 <div class="full-text-header">
-                                     <button class="icon-btn copy-full-text-btn" title="一鍵複製全文" data-text-to-copy="${encodedPolishedText}">
-                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                     </button>
-                                 </div>
-                                 <div class="polished-text-content">${highlightedFullText}</div>
-                            </div>
-                            <div id="comparison-${resultIndex}" class="hidden">
-                                 <div class="comparison-container">${comparisonHTML}</div>
-                            </div>
-                        `;
+                        fullPolishedHtmlWithMarks = applyHighlights(escapeHtml(item.polishedText), item.changes, 'polished');
                     }
+                    
+                    contentHTML = `
+                        <h2 class="vocab-header">${escapeHtml(pageTitle)}</h2>
+                        <div class="view-switcher">
+                            <button class="view-btn active" data-view="full-text-${resultIndex}">閱覽全文</button>
+                            <button class="view-btn" data-view="comparison-${resultIndex}">逐段比對</button>
+                        </div>
+                        <div id="full-text-${resultIndex}">
+                             <div class="full-text-header">
+                                 <button class="icon-btn copy-full-text-btn" title="一鍵複製全文" data-text-to-copy="${encodedPolishedTextClean}">
+                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                 </button>
+                             </div>
+                             <div class="polished-text-content">${fullPolishedHtmlWithMarks.replace(/\n/g, '<br>')}</div>
+                        </div>
+                        <div id="comparison-${resultIndex}" class="hidden">
+                             <div class="comparison-container">${comparisonHTML}</div>
+                        </div>
+                    `;
+
                  } else { // Vocab type
                     const examplesHTML = item.examples.map(ex => `<li>${escapeHtml(ex)}</li>`).join('');
                     contentHTML = `
-                        <h2 class="vocab-header">${escapeHtml(item.vocab)}</h2>
+                        <h2 class="vocab-header">${escapeHtml(pageTitle)}</h2>
                         <div class="vocab-definition-container">
                            <p class="vocab-definition">${escapeHtml(item.definition)}</p>
                         </div>
@@ -1508,8 +1548,6 @@ ${jsonFormatInstruction}`;
     
     async function handleReaderClick(e) {
         const target = e.target;
-
-        // Logic for clicking the copy button
         const copyBtn = target.closest('.copy-full-text-btn');
         if (copyBtn) {
             e.preventDefault();
@@ -1525,95 +1563,178 @@ ${jsonFormatInstruction}`;
         }
     }
 
-
     function showToast(message, type = 'info') {
-        const existingToast = document.querySelector('.vocab-toast');
-        if (existingToast) existingToast.remove();
-
-        const toast = document.createElement('div');
-        toast.className = 'vocab-toast';
-        toast.textContent = message;
+        vocabToast.textContent = message;
+        vocabToast.className = 'vocab-toast'; // Reset classes
+        if (type === 'success') vocabToast.classList.add('success');
+        else if (type === 'error') vocabToast.classList.add('error');
         
-        if (type === 'success') toast.style.backgroundColor = '#27ae60';
-        else if (type === 'error') toast.style.backgroundColor = '#c0392b';
-        
-        document.body.appendChild(toast);
-
-        setTimeout(() => toast.classList.add('show'), 10);
+        vocabToast.classList.add('show');
         setTimeout(() => {
-            toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => toast.remove());
+            vocabToast.classList.remove('show');
         }, 3000);
     }
 
-    // --- 8. 歷史紀錄相關函式 ---
-    function showHistory() { renderHistory(); historyModal.classList.add('is-visible'); }
-    function hideHistory() { historyModal.classList.remove('is-visible'); }
+    // --- 8. [REVISED] 歷史紀錄相關函式 ---
+    function showHistory() {
+        updateHistoryModalUI();
+        renderHistory();
+        historyModal.classList.add('is-visible');
+    }
 
-    function deleteAllHistory() {
-        if (state.history.length === 0) return;
-        if (confirm('您確定要刪除所有閱讀紀錄嗎？此操作無法復原。')) {
-            state.history = [];
-            localStorage.setItem('vocabHistory_v2', '[]');
+    function hideHistory() {
+        historyModal.classList.remove('is-visible');
+    }
+
+    function switchHistoryTab(e) {
+        const newTab = e.target.dataset.historyType;
+        if (newTab === state.activeHistoryTab) return;
+
+        state.activeHistoryTab = newTab;
+        historyTabBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.historyType === newTab);
+        });
+        
+        historySearch.value = ''; // Clear search on tab switch
+        updateHistoryModalUI();
+        renderHistory();
+    }
+
+    function updateHistoryModalUI() {
+        historySort.innerHTML = ''; // Clear existing options
+        if (state.activeHistoryTab === 'lookup') {
+            historyTitle.textContent = '詞彙表';
+            historySearch.placeholder = '按詞彙搜尋...';
+            historySearch.type = 'search';
+            // [REVISION 2] Only date sorting is available
+            [
+                { value: 'date_desc', text: '按生成日期 (新到舊)' },
+                { value: 'date_asc', text: '按生成日期 (舊到新)' },
+            ].forEach(opt => historySort.add(new Option(opt.text, opt.value)));
+        } else { // polishing
+            historyTitle.textContent = '潤色紀錄';
+            historySearch.placeholder = '按篇名搜尋...';
+            historySearch.type = 'search';
+            // [REVISION 2] Only date sorting is available
+            [
+                { value: 'date_desc', text: '按生成日期 (新到舊)' },
+                { value: 'date_asc', text: '按生成日期 (舊到新)' },
+            ].forEach(opt => historySort.add(new Option(opt.text, opt.value)));
+        }
+    }
+    
+    function deleteAllHistoryForCurrentTab() {
+        const tab = state.activeHistoryTab;
+        const tabName = tab === 'lookup' ? '詞彙表' : '潤色紀錄';
+        const historyArray = tab === 'lookup' ? state.lookupHistory : state.polishingHistory;
+
+        if (historyArray.length === 0) return;
+        if (confirm(`您確定要刪除所有「${tabName}」嗎？此操作無法復原。`)) {
+            if (tab === 'lookup') {
+                state.lookupHistory = [];
+                localStorage.setItem('vocabHistory_v3', '[]');
+            } else {
+                state.polishingHistory = [];
+                localStorage.setItem('polishingHistory_v1', '[]');
+            }
             renderHistory();
         }
     }
 
+
     function renderHistory() {
-        let items = [...state.history];
-        const term = historySearch.value;
+        const tab = state.activeHistoryTab;
+        let items = tab === 'lookup' ? [...state.lookupHistory] : [...state.polishingHistory];
+        const term = historySearch.value.trim();
+
         if (term) {
-            const strokeCount = parseInt(term);
-            if (!isNaN(strokeCount)) {
-                items = items.filter(i => i.stroke_count === strokeCount);
+            const lowerCaseTerm = term.toLowerCase();
+            if (tab === 'lookup') {
+                items = items.filter(i => i.vocab && i.vocab.toLowerCase().includes(lowerCaseTerm));
+            } else { // polishing
+                items = items.filter(i => i.title && i.title.toLowerCase().includes(lowerCaseTerm));
             }
         }
 
+        // [REVISION 2] Simplified sorting logic, only date-based sorting is used.
         items.sort((a, b) => {
-            switch (historySort.value) {
-                case 'date_asc': return new Date(a.generatedDate) - new Date(b.generatedDate);
-                case 'stroke_asc': return (a.stroke_count || 99) - (b.stroke_count || 99);
-                case 'stroke_desc': return (b.stroke_count || 0) - (a.stroke_count || 0);
-                default: return new Date(b.generatedDate) - new Date(a.generatedDate);
+            const sortOrder = historySort.value;
+            if (sortOrder === 'date_asc') {
+                return new Date(a.generatedDate) - new Date(b.generatedDate);
             }
+            return new Date(b.generatedDate) - new Date(a.generatedDate); // Default: date_desc
         });
 
-        historyList.innerHTML = items.length === 0 
-            ? `<li class="no-history-msg">${term ? '找不到符合條件的紀錄。' : '目前沒有閱讀紀錄。'}</li>`
-            : items.map((item, index) => `
-                <li data-history-id="${item.id}" data-vocab="${item.vocab}">
-                    <div class="history-item-content">
-                        <div class="history-list-item-title">${index + 1}. ${item.vocab}</div>
-                        <div class="history-list-item-meta">
-                            ${item.stroke_count ? ` ${item.stroke_count}劃` : '無筆劃資訊'} - ${new Date(item.generatedDate).toLocaleDateString('zh-TW')}
+        if (items.length === 0) {
+            const msg = term ? '找不到符合條件的紀錄。' : 
+                        tab === 'lookup' ? '目前沒有詞彙表。' : '目前沒有潤色紀錄。';
+            historyList.innerHTML = `<li class="no-history-msg">${msg}</li>`;
+        } else {
+            historyList.innerHTML = items.map((item, index) => {
+                if (tab === 'lookup') {
+                    // [REVISION 2] Removed stroke count display.
+                    return `
+                    <li data-history-id="${item.id}" data-type="lookup">
+                        <div class="history-item-content">
+                            <div class="history-list-item-title">${index + 1}. ${item.vocab}</div>
+                            <div class="history-list-item-meta">
+                                ${new Date(item.generatedDate).toLocaleDateString('zh-TW')}
+                            </div>
                         </div>
-                    </div>
-                    <div class="history-item-actions">
-                        <button class="icon-btn regenerate-history-btn" title="重新生成此詞彙的解釋與例句">
-                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8h-6V2l2.25 2.25A12.012 12.012 0 0 0 12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 9-4.25 9-4.25"/></svg>
-                        </button>
-                        <button class="icon-btn delete-history-btn" title="刪除此紀錄">
-                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                    </div>
-                </li>`).join('');
+                        <div class="history-item-actions">
+                            <button class="icon-btn regenerate-history-btn" title="重新生成此詞彙的解釋與例句">
+                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8h-6V2l2.25 2.25A12.012 12.012 0 0 0 12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 9-4.25 9-4.25"/></svg>
+                            </button>
+                            <button class="icon-btn delete-history-btn" title="刪除此紀錄">
+                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </li>`;
+                } else { // polishing
+                     const polishType = item.type === 'word-polish-result' ? '詞語潤色' : '文句潤色';
+                     // [REVISION 1] Added edit title button.
+                     return `
+                     <li data-history-id="${item.id}" data-type="polishing">
+                        <div class="history-item-content">
+                            <div class="history-list-item-title">${index + 1}. ${item.title}</div>
+                            <div class="history-list-item-meta">
+                                ${polishType} - ${new Date(item.generatedDate).toLocaleDateString('zh-TW')}
+                            </div>
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="icon-btn edit-history-title-btn" title="修訂篇名">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                            </button>
+                            <button class="icon-btn delete-history-btn" title="刪除此紀錄">
+                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </li>`;
+                }
+            }).join('');
+        }
     }
     
-    async function regenerateHistoryItem(id, vocab, element) {
+    async function regenerateLookupHistoryItem(id, element) {
+        const item = state.lookupHistory.find(i => i.id === id);
+        if (!item) return;
+
         element.classList.add('is-loading');
         try {
-            const results = await fetchVocabulary({ mode: 'lookup', query: vocab });
+            const results = await fetchVocabulary({ mode: 'lookup', query: item.vocab });
             if (results && results.length > 0) {
                 const newItem = results[0];
-                const index = state.history.findIndex(item => item.id === id);
+                const index = state.lookupHistory.findIndex(i => i.id === id);
                 if (index !== -1) {
-                    state.history[index] = newItem;
-                    localStorage.setItem('vocabHistory_v2', JSON.stringify(state.history));
-                    renderHistory();
+                    state.lookupHistory[index] = newItem;
+                    localStorage.setItem('vocabHistory_v3', JSON.stringify(state.lookupHistory));
+                    renderHistory(); // Will re-render with the new item, removing loading state
                 }
+            } else {
+                 element.classList.remove('is-loading');
             }
         } catch(error) {
-            showError(`重新生成失败: ${error.message}`);
+            showError(`重新生成失敗: ${error.message}`);
             element.classList.remove('is-loading');
         }
     }
@@ -1623,33 +1744,52 @@ ${jsonFormatInstruction}`;
         if (!li) return;
 
         const id = li.dataset.historyId;
-        const vocab = li.dataset.vocab;
+        const type = li.dataset.type;
+        const sourceArray = type === 'lookup' ? state.lookupHistory : state.polishingHistory;
+        const item = sourceArray.find(i => i.id === id);
+        if (!item) return;
+
+        const title = item.vocab || item.title;
+        
+        // [REVISION 1] Handle click on the new edit title button
+        if (e.target.closest('.edit-history-title-btn')) {
+            const newTitle = prompt('請修訂此紀錄的篇名：', item.title);
+            if (newTitle && newTitle.trim() !== '' && newTitle.trim() !== item.title) {
+                item.title = newTitle.trim();
+                localStorage.setItem('polishingHistory_v1', JSON.stringify(state.polishingHistory));
+                renderHistory(); // Refresh the list to show the new title
+                showToast('篇名已修訂', 'success');
+            }
+            return; // Stop further execution
+        }
 
         if (e.target.closest('.regenerate-history-btn')) {
-            if (confirm(`您確定要重新生成「${vocab}」的解釋與例句嗎？這將會覆蓋現有紀錄。`)) {
-                regenerateHistoryItem(id, vocab, li);
+             if (confirm(`您確定要重新生成「${title}」的解釋與例句嗎？這將會覆蓋現有紀錄。`)) {
+                regenerateLookupHistoryItem(id, li);
             }
             return;
         }
 
         if (e.target.closest('.delete-history-btn')) {
-            if (confirm(`您確定要刪除「${vocab}」這筆紀錄嗎？`)) {
-                state.history = state.history.filter(item => item.id !== id);
-                localStorage.setItem('vocabHistory_v2', JSON.stringify(state.history));
+            if (confirm(`您確定要刪除「${title}」這筆紀錄嗎？`)) {
+                if(type === 'lookup'){
+                    state.lookupHistory = state.lookupHistory.filter(i => i.id !== id);
+                    localStorage.setItem('vocabHistory_v3', JSON.stringify(state.lookupHistory));
+                } else {
+                    state.polishingHistory = state.polishingHistory.filter(i => i.id !== id);
+                    localStorage.setItem('polishingHistory_v1', JSON.stringify(state.polishingHistory));
+                }
                 renderHistory();
             }
             return;
         }
 
         if (e.target.closest('.history-item-content')) {
-            const item = state.history.find(i => i.id === id);
-            if (item) {
-                state.currentResults = [item];
-                state.currentPageNum = 0;
-                displayResultsAsBook(state.currentResults);
-                switchToReaderView();
-                hideHistory();
-            }
+            state.currentResults = [item];
+            state.currentPageNum = 0;
+            displayResultsAsBook(state.currentResults);
+            switchToReaderView();
+            hideHistory();
         }
     }
 }
