@@ -11,29 +11,45 @@
 <style>
 /* --- 1. 核心與主題設定 (Core & Theming) --- */
 :root {
-    /* 參考「一瞬之詩」的亮色主題 */
-    --bg-color-light: #F5F3EF; /* 仿宣紙的米白 */
-    --text-primary-light: #3D3B37; /* 墨色 */
-    --text-secondary-light: #A39B8B; /* 枯木色 */
-    --content-bg-light: #FFFFFF;
-    --border-color-light: #DCD6C8; /* 淺石色 */
-    --accent-color: #A39B8B; /* 枯木色 */
-    --accent-color-hover: #8E8473;
+    /* 新的淡雅色彩主題 */
+    --bg-color-light: #EAF0ED; /* 淡雅灰綠 */
+    --text-primary-light: #5C554E; /* 深灰棕 */
+    --text-secondary-light: #A8A19A; /* 柔和灰 */
+    --content-bg-light: #F7F2EC; /* 柔和沙色 */
+    --border-color-light: #D9D2C9; /* 淺褐色 */
+    --accent-color: #7A9E9F; /* 雅緻青藍 */
+    --accent-color-hover: #688889;
 
-    /* 基於亮色主題推衍的暗色主題 */
-    --bg-color-dark: #282623;
-    --text-primary-dark: #D1CFCB;
-    --text-secondary-dark: #888279;
-    --content-bg-dark: #3D3B37;
-    --border-color-dark: #5A5650;
+    /* 暗色主題 (基於新主題推衍) */
+    --bg-color-dark: #2C302E;
+    --text-primary-dark: #E0D9D1;
+    --text-secondary-dark: #918A81;
+    --content-bg-dark: #3F3A35;
+    --border-color-dark: #5C554E;
 
-    --overlay-bg: rgba(44, 62, 80, 0.7);
+    --overlay-bg: rgba(44, 48, 46, 0.7);
 
     --font-sans: 'Noto Sans TC', sans-serif;
     --font-serif: 'Noto Serif TC', serif;
-    --max-width: 900px; /* 調整最大寬度以適應內容 */
-
+    --max-width: 900px;
     --reader-font-size: 1.1rem;
+
+    /* 高亮顏色 */
+    --mark-original-bg-light: #FDEBCF; /* 柔和橘黃 */
+    --mark-polished-bg-light: #D6EBE5; /* 柔和薄荷綠 */
+    --mark-original-bg-dark: #6E5B3D;
+    --mark-polished-bg-dark: #3A5F5A;
+    
+    /* [新增] 為兩種潤色模式定義專屬顏色 */
+    /* 詞彙潤色 (Word Polish) - 新增主題色 (灰紫) */
+    --accent-word: #A38C94;
+    --mark-bg-word-light: #EAE0E3; /* 淡雅藕粉 */
+    --mark-bg-word-dark: #59494F;
+
+    /* 文句潤色 (Prose Polish) - 沿用現有顏色 */
+    --accent-prose: var(--accent-color); /* 沿用青藍 */
+    --mark-bg-prose-light: var(--mark-polished-bg-light);
+    --mark-bg-prose-dark: var(--mark-polished-bg-dark);
 }
 
 *, *::before, *::after {
@@ -114,7 +130,7 @@ body.dark-mode {
 /* Mode Switcher */
 .mode-switcher {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 將容器改為 2x2 的網格佈局 */
+    grid-template-columns: repeat(2, 1fr);
     justify-content: center;
     margin-bottom: 2rem;
     border-bottom: 1px solid;
@@ -122,6 +138,8 @@ body.dark-mode {
 }
 .light-mode .mode-switcher { border-color: var(--border-color-light); }
 .dark-mode .mode-switcher { border-color: var(--border-color-dark); }
+
+/* --- [第一步：設定所有按鈕的基礎樣式] --- */
 .mode-btn {
     font-family: var(--font-sans);
     font-size: 1rem;
@@ -131,13 +149,39 @@ body.dark-mode {
     background-color: transparent;
     cursor: pointer;
     position: relative;
-    transition: color 0.3s;
+    transition: color 0.3s, opacity 0.3s; /* 加上 opacity 過渡效果 */
 }
+
+/* 「查找」和「隨機」按鈕的預設顏色 (未選中) */
 .light-mode .mode-btn { color: var(--text-secondary-light); }
 .dark-mode .mode-btn { color: var(--text-secondary-dark); }
+
+/* 「查找」和「隨機」按鈕被選中時的顏色 */
 .light-mode .mode-btn.active { color: var(--text-primary-light); }
 .dark-mode .mode-btn.active { color: var(--text-primary-dark); }
 
+
+/* --- [第二步：專門為潤色按鈕設定不同的預設顏色] --- */
+
+/* 「詞語」和「文句」潤色按鈕的預設顏色 (未選中) */
+.mode-btn[data-mode="word-polish"],
+.mode-btn[data-mode="prose-polish"] {
+    color: var(--accent-word); /* 直接套用灰紫色 */
+    opacity: 1;              /* 但用透明度讓它變淡，表示未選中 */
+}
+
+/* --- [第三步：設定潤色按鈕被選中時的樣式] --- */
+
+/* 「詞語」和「文句」潤色按鈕被選中時，變為實色 */
+.mode-btn[data-mode="word-polish"].active,
+.mode-btn[data-mode="prose-polish"].active {
+    color: var(--accent-word);
+    opacity: 1; /* 移除透明度，讓它變為飽和的實色 */
+}
+
+/* --- [第四步：統一所有按鈕的底線樣式] --- */
+
+/* 所有按鈕共用的底線基礎樣式 */
 .mode-btn::after {
     content: '';
     position: absolute;
@@ -145,14 +189,25 @@ body.dark-mode {
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: var(--accent-color);
+    background-color: var(--accent-color); /* 預設為綠色 */
     transform: scaleX(0);
-    transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out, background-color 0.3s; /* 加上顏色過渡 */
 }
 .mode-btn.active::after {
     transform: scaleX(1);
 }
 
+/* 潤色按鈕被選中時，底線變為紫色 */
+.mode-btn[data-mode="word-polish"].active::after,
+.mode-btn[data-mode="prose-polish"].active::after {
+    background-color: var(--accent-word);
+}
+
+/* 確保在暗色模式下也使用專屬顏色 */
+.dark-mode .mode-btn[data-mode="word-polish"].active,
+.dark-mode .mode-btn[data-mode="prose-polish"].active {
+    color: inherit;
+}
 .form-container { padding-top: 0.5rem; }
 .form-group { margin-bottom: 1.75rem; }
 .form-group label { display: block; margin-bottom: 0.75rem; font-weight: 500; font-size: 1.1rem; }
@@ -451,8 +506,13 @@ body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
 }
 .light-mode .view-btn { color: var(--text-secondary-light); }
 .dark-mode .view-btn { color: var(--text-secondary-dark); }
+
+/* [修訂] 讓檢視按鈕的 active 狀態顏色也根據模式改變 */
 .view-btn.active {
-    border-bottom: 2px solid var(--accent-color);
+    border-bottom: 2px solid var(--accent-prose); /* 預設為文句潤色 (青藍) */
+}
+.word-polish-view .view-btn.active {
+    border-bottom-color: var(--accent-word); /* 覆寫為詞彙潤色 (灰紫) */
 }
 .light-mode .view-btn.active { color: var(--text-primary-light); }
 .dark-mode .view-btn.active { color: var(--text-primary-dark); }
@@ -479,10 +539,17 @@ body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
     white-space: pre-wrap;
     border: 1px solid;
 }
+
+/* [修訂] 為不同潤色模式設定不同背景色 */
 .light-mode .original-para { background-color: #fdf8f2; border-color: var(--border-color-light); }
-.light-mode .polished-para { background-color: #f2f7fd; border-color: var(--border-color-light); }
 .dark-mode .original-para { background-color: #3a3631; border-color: var(--border-color-dark); }
-.dark-mode .polished-para { background-color: #2f3b48; border-color: var(--border-color-dark); }
+
+.light-mode .prose-polish-view .polished-para { background-color: #f2f7fd; border-color: var(--border-color-light); } /* 文句潤色(青藍系) */
+.dark-mode .prose-polish-view .polished-para { background-color: #2f3b48; border-color: var(--border-color-dark); }
+
+.light-mode .word-polish-view .polished-para { background-color: #f7f2f4; border-color: var(--border-color-light); } /* 詞彙潤色(灰紫系) */
+.dark-mode .word-polish-view .polished-para { background-color: #3e363a; border-color: var(--border-color-dark); }
+
 
 .para-marker {
     font-size: 0.9em;
@@ -496,24 +563,36 @@ body.fullscreen-mode .fullscreen-btn .icon-exit-fullscreen { display: block; }
 }
 
 mark.mark-original {
-    background-color: #ffe0b3; /* Light Orange */
+    background-color: var(--mark-original-bg-light);
     color: inherit;
     padding: 0.1em 0;
     border-radius: 2px;
-}
-mark.mark-polished {
-    background-color: #cceeff; /* Light Blue */
-    color: inherit;
-    padding: 0.1em 0;
-    border-radius: 2px;
-    border-bottom: 1px dotted var(--accent-color);
 }
 .dark-mode mark.mark-original {
-    background-color: #5c421a;
+    background-color: var(--mark-original-bg-dark);
+}
+
+/* [修訂] 讓 mark 顏色根據父層容器的模式切換 */
+mark.mark-polished {
+    background-color: var(--mark-bg-prose-light); /* 預設為文句潤色(青藍系) */
+    color: inherit;
+    padding: 0.1em 0;
+    border-radius: 2px;
+    border-bottom: 1px dotted var(--accent-prose);
 }
 .dark-mode mark.mark-polished {
-    background-color: #1a4a5c;
+    background-color: var(--mark-bg-prose-dark);
 }
+
+/* 詞彙潤色模式的專屬覆寫 */
+.word-polish-view mark.mark-polished {
+    background-color: var(--mark-bg-word-light); /* 覆寫為詞彙潤色(灰紫系) */
+    border-bottom-color: var(--accent-word);
+}
+.dark-mode .word-polish-view mark.mark-polished {
+    background-color: var(--mark-bg-word-dark);
+}
+
 
 /* --- [REVISION] Notification Toast --- */
 .vocab-toast {
@@ -552,7 +631,7 @@ mark.mark-polished {
 .dark-mode .prose-result-header { border-color: var(--border-color-dark); }
 
 
-/* --- 14. [NEW] 詞語潤色模式擴充 (Word Polish Mode Extensions) --- */
+/* --- 14. [NEW] 詞彙潤色模式擴充 (Word Polish Mode Extensions) --- */
 .full-text-header {
     display: flex;
     justify-content: flex-end;
@@ -595,8 +674,8 @@ mark.mark-polished {
     <div class="mode-switcher">
         <button class="mode-btn active" data-mode="lookup">查找詞彙</button>
         <button class="mode-btn" data-mode="generate">隨機找詞</button>
-        <button class="mode-btn" data-mode="word-polish">詞語潤色</button>
-        <button class="mode-btn" data-mode="prose-polish">文句潤色</button>
+        <button class="mode-btn" data-mode="word-polish">潤色詞彙</button>
+        <button class="mode-btn" data-mode="prose-polish">潤色文句</button>
     </div>
     
     <div class="form-container">
@@ -634,7 +713,7 @@ mark.mark-polished {
             </div>
         </form>
 
-        <!-- [MODIFIED] 詞語潤色模式表單 -->
+        <!-- [MODIFIED] 詞彙潤色模式表單 -->
         <form id="word-polish-form" class="hidden">
             <div class="form-group">
                 <label for="word-polish-text">原文</label>
@@ -916,8 +995,16 @@ function initializeApp() {
         localStorage.setItem('theme', newTheme);
         updateThemeIcons(newTheme);
 
-        if (!readingSection.classList.contains('hidden') && state.currentResults) {
-            setTimeout(() => displayResultsAsBook(state.currentResults), 50);
+        // Per requirement: when switching themes, default to fullscreen mode.
+        // This is combined with the original repagination logic for efficiency.
+        if (!readingSection.classList.contains('hidden')) {
+             if (!body.classList.contains('fullscreen-mode')) {
+                // Not in fullscreen, so enter it. The function handles repagination.
+                toggleFullscreen(); 
+             } else if (state.currentResults) {
+                // Already in fullscreen, but still need to repaginate for the new theme.
+                setTimeout(() => displayResultsAsBook(state.currentResults), 50);
+             }
         }
     }
 
@@ -1057,7 +1144,7 @@ function initializeApp() {
     async function fetchProsePolishedText(text, difficulty) {
         // [REVISION 3] Updated prompt for paired highlighting
         const systemPrompt = `你是一位專業的中文文學編輯，擅長將平實的文字改寫得更具文采和深度。
-你的任務是根據使用者提供的文本，進行「文句潤色」，並將原文與潤色後的文句進行配對。
+你的任務是要在維持原文字數絕不減少的大前提下，根據使用者提供的文本，進行「文句潤色」，並將原文與潤色後的文句進行配對。
 
 核心規則：
 1.  【嚴守原意】：潤色後的文句必須保持原文的核心資訊和敘事框架。
@@ -1185,7 +1272,7 @@ JSON 格式範例:
 
             return {
                 type: 'word-polish-result',
-                vocab: '詞語潤色結果', // Default title, will be overridden later
+                vocab: '詞彙潤色結果', // Default title, will be overridden later
                 originalText: text,
                 polishedText: content.polishedText,
                 changes: content.changes,
@@ -1194,7 +1281,7 @@ JSON 格式範例:
 
         } catch (error) {
             console.error("API Error (Word Polish):", error);
-            showError(`詞語潤色失敗: ${error.message}`);
+            showError(`詞彙潤色失敗: ${error.message}`);
             return null;
         }
     }
@@ -1410,6 +1497,14 @@ ${jsonFormatInstruction}`;
                 let contentHTML = '';
                 const pageTitle = item.title || item.vocab;
 
+                // [修訂] 根據結果類型，準備要加入的標示性 class
+                let viewModeClass = '';
+                if (item.type === 'word-polish-result') {
+                    viewModeClass = 'word-polish-view';
+                } else if (item.type === 'prose-polish-result') {
+                    viewModeClass = 'prose-polish-view';
+                }
+
                 if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
                      let comparisonHTML = '';
                      let fullPolishedHtmlWithMarks = '';
@@ -1495,7 +1590,8 @@ ${jsonFormatInstruction}`;
                     `;
                 }
                 
-                pageElement.innerHTML = `<div class="page-content">${contentHTML}</div>`;
+                // [修訂] 將標示性 class 加入到 page-content 中
+                pageElement.innerHTML = `<div class="page-content ${viewModeClass}">${contentHTML}</div>`;
                 book.appendChild(pageElement);
                 
                  if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
@@ -1692,7 +1788,7 @@ ${jsonFormatInstruction}`;
                         </div>
                     </li>`;
                 } else { // polishing
-                     const polishType = item.type === 'word-polish-result' ? '詞語潤色' : '文句潤色';
+                     const polishType = item.type === 'word-polish-result' ? '詞彙潤色' : '文句潤色';
                      // [REVISION 1] Added edit title button.
                      return `
                      <li data-history-id="${item.id}" data-type="polishing">
