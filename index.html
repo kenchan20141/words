@@ -1370,10 +1370,12 @@ ${jsonFormatInstruction}`;
                 if (!item.vocab || !item.definition || !item.examples || item.examples.length < 5) {
                     throw new Error(`詞彙 "${item.vocab || '未知'}" 的資料不完整。`);
                 }
-                item.type = 'vocab'; // Differentiate from polish results
-                item.generatedDate = new Date().toISOString();
-                item.id = item.generatedDate; // Use timestamp as a unique, stable ID
-            });
+                item.type = 'vocab';
+    const timestamp = new Date().toISOString(); // 先將時間存起來
+    item.generatedDate = timestamp;
+    // 將時間戳記與詞彙本身組合，形成一個獨一無二的 ID
+    item.id = `${timestamp}-${item.vocab}`; // <-- 已修訂
+});
 
             return parsedData.results;
         } catch(error) {
