@@ -1180,7 +1180,7 @@ mark.mark-polished.is-loading {
 </header>
 
 <div class="mode-switcher">
-<button class="mode-btn active" data-mode="lookup">查找詞彙</button>
+<button class="mode-btn active" data-mode="lookup">查考義例</button>
 <button class="mode-btn" data-mode="generate">隨機找詞</button>
 <button class="mode-btn" data-mode="word-polish">潤色詞彙</button>
 <button class="mode-btn" data-mode="prose-polish">潤色文句</button>
@@ -1190,7 +1190,7 @@ mark.mark-polished.is-loading {
 <!-- 查找詞彙表單 (預設顯示) -->
 <form id="lookup-form">
 <div class="form-group">
-<label for="lookup-word">查找</label>
+<label for="lookup-word">查考</label>
 <input type="text" id="lookup-word" placeholder="輸入一個詞彙...">
 </div>
 </form>
@@ -1254,7 +1254,7 @@ mark.mark-polished.is-loading {
 </form>
 
 <button type="submit" id="submit-btn" class="submit-btn">
-<span class="btn-text">開始查找</span>
+<span class="btn-text">開始查考</span>
 </button>
 <div id="error-message"></div>
 </div>
@@ -1753,10 +1753,10 @@ prosePolishForm.classList.add('hidden');
 let btnText = '';
 if (newMode === 'lookup') {
 lookupForm.classList.remove('hidden');
-btnText = '開始查找';
+btnText = '開始查考';
 } else if (newMode === 'generate') {
 generateForm.classList.remove('hidden');
-btnText = '開始生成';
+btnText = '開始尋找';
 } else if (newMode === 'word-polish'){
 wordPolishForm.classList.remove('hidden');
 btnText = '開始潤色';
