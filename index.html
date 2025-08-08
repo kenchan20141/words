@@ -11,6 +11,51 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* --- [修訂] 測驗按鈕光暈與點擊效果 --- */
+
+/* 1. 定義「光暈」的脈動效果 (此部分保留不變) */
+@keyframes pulse-glow {
+  0%, 100% {
+    /* 使用 var(--accent-color) 確保主題一致性 */
+    box-shadow: 0 0 8px 2px rgba(122, 158, 159, 0.2); 
+  }
+  50% {
+    box-shadow: 0 0 12px 5px rgba(122, 158, 159, 0.5);
+  }
+}
+
+/* 2. 設定測驗按鈕的「平時」樣式 */
+#quiz-btn {
+  /* position: relative 已經不再需要，因為沒有偽元素了 */
+  overflow: visible; /* 確保光暈不會被裁切 */
+  animation: pulse-glow 3s infinite ease-in-out;
+  transition: transform 0.1s ease, background-color 0.1s ease; /* 為了點擊時的縮放和顏色變化更平滑 */
+}
+
+/* 3. 新增按鈕被「點擊時」(:active) 的樣式 */
+#quiz-btn:active {
+  /* (a) 立即停止平時的脈動動畫 */
+  animation: none;
+  
+  /* (b) 改變背景色，提供明確的視覺回饋 */
+  /* 我們選用一個主題中的顏色 var(--accent-word) 作為點擊色 */
+  background-color: var(--accent-word); 
+  
+  /* (c) 產生一個新的、更強烈的靜態光暈，顏色與背景色匹配 */
+  box-shadow: 0 0 10px 4px rgba(163, 140, 148, 0.6); /* 這是 --accent-word 的 RGBA 版本 */
+
+  /* (d) 增加一個輕微的內縮效果，模仿真實按鈕被按下的感覺 */
+  transform: scale(0.95);
+}
+
+/* 4. 確保在點擊時，按鈕內的 SVG 圖示顏色能與新背景形成對比 */
+#quiz-btn:active svg {
+  /* 將圖示的線條顏色變為淺色，確保在深色背景下清晰可見 */
+  stroke: var(--bg-color-light); 
+}
+
+    
 /* --- 1. 核心與主題設定 (Core & Theming) --- */
 :root {
 /* 新的淡雅色彩主題 */
