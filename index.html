@@ -1573,7 +1573,17 @@ const quizMixSelection = document.getElementById('quiz-mix-selection');
 
 // --- API 配置 ---
 const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
-const API_KEY = "sk-GruTbLTbtSeWof3rEBjtIg";
+const API_KEYS = [
+    "sk-GruTbLTbtSeWof3rEBjtIg", // 您的第一個 KEY
+    "sk-N2hJEV5h9dQl9K_bUrxLtw",
+    "sk-ugZDzju3AbV2QeJS1Y415Q"
+    // 如果有更多，可以繼續往下添加...
+];
+
+  function getRandomApiKey() {
+  const randomIndex = Math.floor(Math.random() * API_KEYS.length);
+  return API_KEYS[randomIndex];
+}
 
 // --- 2. 狀態管理 ---
 let state = {
@@ -1914,7 +1924,7 @@ JSON 格式範例:
 try {
 const response = await fetch(API_URL, {
 method: 'POST',
-headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
 body: JSON.stringify({
 model: "Qwen3-235B-A22B-Instruct-2507-FP8",
 messages: [{ role: "user", content: systemPrompt }],
@@ -1984,7 +1994,7 @@ JSON 格式範例:
 try {
 const response = await fetch(API_URL, {
 method: 'POST',
-headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
 body: JSON.stringify({
 model: "Qwen3-235B-A22B-Instruct-2507-FP8",
 messages: [{ role: "user", content: systemPrompt }],
@@ -2075,7 +2085,7 @@ ${jsonFormatInstruction}`;
 try {
 const response = await fetch(API_URL, {
 method: 'POST',
-headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
 body: JSON.stringify({
 model: "Qwen3-235B-A22B-Instruct-2507-FP8",
 messages: [{ role: "user", content: systemPrompt }],
@@ -2736,7 +2746,7 @@ async function fetchAIBatchSentences(vocabArray) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
             body: JSON.stringify({
                 model: "Qwen3-235B-A22B-Instruct-2507-FP8",
                 messages: [{ role: "user", content: systemPrompt }],
@@ -2785,7 +2795,7 @@ async function evaluateSentence(vocab, userSentence) {
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${API_KEY}` },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
             body: JSON.stringify({
                 model: "Qwen3-235B-A22B-Instruct-2507-FP8",
                 messages: [{ role: "user", content: systemPrompt }],
