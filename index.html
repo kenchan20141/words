@@ -1437,7 +1437,7 @@ input[type="text"]:not(.no-modal-editor):hover {
 </div>
 
 <div class="history-controls">
-<input type="search" id="history-search" placeholder="按詞彙搜尋...">
+<input type="search" id="history-search" class="no-modal-editor" placeholder="按詞彙搜尋...">
 <select id="history-sort"></select> <!-- Options will be populated by JS -->
 </div>
 <ul class="history-list" id="history-list"></ul>
@@ -1570,7 +1570,7 @@ input[type="text"]:not(.no-modal-editor):hover {
                 <!-- JS populates buttons -->
             </div>
              <div id="quiz-sentence-area" class="hidden">
-                <textarea id="quiz-sentence-input" placeholder="請使用上面的詞彙造句..."></textarea>
+                <textarea id="quiz-sentence-input" class="no-modal-editor" placeholder="請使用上面的詞彙造句..."></textarea>
                 <button id="quiz-sentence-submit" class="submit-btn">
                     <span class="btn-text">提交批改</span>
                 </button>
