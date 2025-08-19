@@ -1148,6 +1148,129 @@ mark.mark-polished.is-loading {
 }
 
 
+  /* --- 通用輸入框懸浮視窗 (CSS) --- */
+
+/* 1. 讓所有符合條件的輸入框看起來可以點擊 */
+textarea:not(.no-modal-editor),
+input[type="text"]:not(.no-modal-editor) {
+    cursor: pointer; /* 滑鼠變成手形指標 */
+    background-color: #f0f8ff; /* 淡藍色背景提示 */
+    transition: background-color 0.2s;
+}
+
+/* 2. 當滑鼠懸停時，背景色稍深一點 */
+textarea:not(.no-modal-editor):hover,
+input[type="text"]:not(.no-modal-editor):hover {
+    background-color: #e6f2ff;
+}
+
+/* 3. 懸浮視窗本身的樣式 */
+.outline-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.outline-modal-content {
+    background-color: #fdfdfd;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 700px;
+    position: relative;
+    animation: fadeIn 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.outline-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+#modal-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.3em;
+    line-height: 1.6;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    flex-grow: 1;
+    min-height: 250px;
+}
+
+.outline-modal-content .modal-buttons {
+    text-align: right;
+    margin-top: 15px;
+}
+
+.outline-modal-content .preview-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* 您可能也需要複製 .btn-action 和 .preview-close-btn 的樣式，如果您的工具中尚未定義它們 */
+.btn-action {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    color: white;
+    background-color: rgba(31, 122, 85, 0.8);
+    backdrop-filter: blur(5px);
+}
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    filter: brightness(110%);
+}
+.preview-close-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, color 0.3s;
+    z-index: 2010;
+}
+.preview-close-btn:hover {
+    color: #fff;
+    background-color: #d32f2f;
+}
+
+
 </style>
 </head>
 <body class="light-mode">
@@ -3226,9 +3349,141 @@ document.addEventListener('DOMContentLoaded', initializeApp);
 
 
 
+// =======================================================
+// === 通用懸浮視窗與OCR整合邏輯 (從「神思」移植) ===
+// =======================================================
+document.addEventListener('DOMContentLoaded', function() {
 
+    // --- 懸浮視窗核心邏輯 ---
+    const modal = document.getElementById('outline-editor-modal');
+    const modalTextarea = document.getElementById('modal-textarea');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSaveBtn = document.getElementById('modal-save-btn');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    if (!modal || !modalTextarea || !modalSaveBtn || !modalCloseBtn) {
+        console.error("懸浮視窗的 HTML 結構不完整或未找到！");
+        return;
+    }
+
+    let currentEditingElement = null;
+
+    function openModalEditor(element) {
+        currentEditingElement = element;
+        modalTextarea.value = currentEditingElement.value;
+
+        // 嘗試為視窗設定一個有意義的標題
+        let titleText = '編輯內容'; // 預設標題
+        let associatedLabel = null;
+        if (element.id) {
+            associatedLabel = document.querySelector(`label[for="${element.id}"]`);
+        }
+        if (associatedLabel) {
+            titleText = `編輯「${associatedLabel.textContent.trim().replace(/[:：]/g, '')}」`;
+        }
+        modalTitle.textContent = titleText;
+
+        modal.style.display = 'flex';
+        modalTextarea.focus();
+    }
+
+    function closeModalEditor() {
+        modal.style.display = 'none';
+        currentEditingElement = null;
+    }
+
+    function saveAndCloseEditor() {
+        if (currentEditingElement) {
+            currentEditingElement.value = modalTextarea.value;
+            // 如果您的工具有字數統計等功能，可以在這裡觸發更新事件
+            // currentEditingElement.dispatchEvent(new Event('input'));
+        }
+        closeModalEditor();
+    }
+
+    // 主事件監聽器：監聽頁面上對輸入框的點擊
+    document.body.addEventListener('click', function(event) {
+        const target = event.target;
+        
+        // 判斷點擊的是否為文字輸入框
+        const isTextInput = target.tagName === 'INPUT' && target.type === 'text';
+        const isTextarea = target.tagName === 'TEXTAREA';
+
+        // 如果是，且沒有被標記為 'no-modal-editor'，就打開懸浮視窗
+        if ((isTextInput || isTextarea) && !target.classList.contains('no-modal-editor') && target.id !== 'modal-textarea') {
+            event.preventDefault(); // 阻止預設行為
+            openModalEditor(target);
+        }
+    });
+
+    // 為懸浮視窗的按鈕和外部區域綁定關閉事件
+    modalSaveBtn.addEventListener('click', saveAndCloseEditor);
+    modalCloseBtn.addEventListener('click', closeModalEditor);
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModalEditor();
+        }
+    });
+
+    // --- OCR 整合邏輯 ---
+    const ocrBtn = document.getElementById('modal-ocr-btn');
+    let ocrWindow = null;
+    
+    // 【重要】請確保此URL與您的OCR工具部署的網址一致
+    const VERCEL_OCR_URL = 'https://gemini-ocr-proxy.vercel.app/';
+    
+    if (ocrBtn) {
+        ocrBtn.addEventListener('click', function() {
+            if (ocrWindow && !ocrWindow.closed) {
+                ocrWindow.focus();
+                return;
+            }
+            ocrWindow = window.open(VERCEL_OCR_URL, 'OCRWindow', 'width=650,height=850,scrollbars=yes,resizable=yes');
+        });
+    }
+
+    // 監聽來自OCR子視窗的訊息
+    window.addEventListener('message', function(event) {
+        // 安全性檢查：確保訊息來自您信任的OCR工具
+        if (event.origin !== new URL(VERCEL_OCR_URL).origin) {
+            return;
+        }
+
+        // 處理收到的OCR結果
+        if (event.data && event.data.type === 'ocrResult') {
+            const ocrText = event.data.text;
+            
+            // 將辨識文字附加到懸浮視窗的輸入框中
+            modalTextarea.value += (modalTextarea.value.trim() ? '\n' : '') + ocrText;
+            
+            if (ocrWindow) {
+                ocrWindow.close(); // 自動關閉OCR子視窗
+            }
+            
+            modalTextarea.focus(); // 將焦點移回輸入框
+        }
+    });
+});
 
 
 </script>
+
+<!-- === 通用輸入懸浮視窗 (從「神思」複製) === -->
+<div id="outline-editor-modal" class="outline-modal-overlay">
+    <div class="outline-modal-content">
+        <h3 id="modal-title">編輯內容</h3>
+        <textarea id="modal-textarea" rows="15"></textarea>
+        <div class="modal-buttons">
+            <!-- OCR 按鈕 -->
+            <button id="modal-ocr-btn" class="btn-action" style="background-color: #17a2b8;">OCR</button>
+            
+            <!-- 確認輸入按鈕 -->
+            <button id="modal-save-btn" class="btn-action">輸入</button>
+        </div>
+        <button id="modal-close-btn" class="preview-close-btn" title="關閉">&times;</button>
+    </div>
+</div>
+
+  
 </body>
 </html>
