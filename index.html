@@ -2573,7 +2573,7 @@ async function handleReaderClick(e) {
         if (vocabItemData) {
             try {
                 const vocabItem = JSON.parse(vocabItemData);
-                if (confirm(`您確定要將「${vocabItem.vocab}」納進紀錄嗎？`)) {
+                if (confirm(`您確定要將「${vocabItem.vocab}」納入紀錄嗎？`)) {
                     addToLookupHistory([vocabItem]); // 以陣列形式傳遞單個詞彙
                     showToast(`「${vocabItem.vocab}」已納入紀錄`, 'success');
                     // 讓按鈕失效，避免重複儲存
