@@ -521,9 +521,24 @@ background-color: var(--accent-color); transform: scaleX(0); transition: transfo
 .history-tab-btn.active::after { transform: scaleX(1); }
 
 
-.history-controls { display: flex; gap: 1rem; margin-bottom: 1rem; }
-#history-search { flex-grow: 1; padding: 0.5rem 0.75rem; font-size: 1rem; font-family: var(--font-sans); border-radius: 0; }
-#history-sort { padding: 0.5rem; font-size: 1rem; font-family: var(--font-sans); border-radius: 0; }
+.history-controls {
+    display: flex;
+    gap: 0.75rem; /* 從 1rem 縮小 */
+    margin-bottom: 0.75rem; /* 從 1rem 縮小 */
+}
+#history-search {
+    flex-grow: 1;
+    padding: 0.4rem 0.75rem; /* 垂直內距從 0.5rem 縮小 */
+    font-size: 0.9rem; /* 字體從 1rem 縮小 */
+    font-family: var(--font-sans);
+    border-radius: 0;
+}
+#history-sort {
+    padding: 0.4rem; /* 內距從 0.5rem 縮小 */
+    font-size: 0.9rem; /* 字體從 1rem 縮小 */
+    font-family: var(--font-sans);
+    border-radius: 0;
+}
 .light-mode #history-search, .light-mode #history-sort { background-color: var(--bg-color-light); border: 1px solid var(--border-color-light); color: var(--text-primary-light); }
 .dark-mode #history-search, .dark-mode #history-sort { background-color: var(--bg-color-dark); border: 1px solid var(--border-color-dark); color: var(--text-primary-dark); }
 #history-search:focus, #history-sort:focus { outline: none; border-color: var(--accent-color); }
@@ -552,6 +567,34 @@ background-color: var(--accent-color); transform: scaleX(0); transition: transfo
 .no-history-msg { padding: 2rem; text-align: center; justify-content: center; }
 .light-mode .no-history-msg { color: var(--text-secondary-light); }
 .dark-mode .no-history-msg { color: var(--text-secondary-dark); }
+
+  /* --- [新增] 針對手機版紀錄版面的響應式優化 --- */
+@media (max-width: 600px) {
+    /* 1. 將控制項容器改為垂直堆疊 */
+    .history-controls {
+        flex-direction: column; /* 從水平改為垂直 */
+        gap: 0.5rem;            /* 縮小垂直間距 */
+    }
+
+    /* 2. 稍微縮小整個彈出視窗的內邊距，爭取更多空間 */
+    .history-container {
+        padding: 1.25rem 1rem;
+    }
+
+    /* 3. 縮小列表項目的垂直內邊距，讓列表更緊湊 */
+    .history-list li {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    /* 4. 微調列表項目的字體大小，使其更適合小螢幕 */
+    .history-list-item-title {
+        font-size: 1.1rem;
+    }
+    .history-list-item-meta {
+        font-size: 0.85rem;
+    }
+}
 
 /* --- 10. 響應式設計 (Responsive Design) --- */
 @media (max-width: 768px) {
@@ -1934,78 +1977,78 @@ errorMessage.style.display = 'block';
 }
 
 async function handleSubmit(e) {
-e.preventDefault();
-errorMessage.style.display = 'none';
+    e.preventDefault();
+    errorMessage.style.display = 'none';
 
-try {
-if (state.activeMode === 'word-polish') {
-const text = wordPolishTextarea.value.trim();
-if (!text) {
-showError('請輸入需要潤色「詞語」的內容。');
-return;
-}
-setLoading(true, submitBtn, '潤色中...');
-const result = await fetchWordPolishedText(text, state.wordPolishDifficulty);
-if (result) {
-addToPolishingHistory(result);
-state.currentResults = [result];
-state.currentPageNum = 0;
-displayResultsAsBook(state.currentResults);
-switchToReaderView();
-}
-} else if (state.activeMode === 'prose-polish') {
-const text = prosePolishTextarea.value.trim();
-if (!text) {
-showError('請輸入需要潤色「文句」的內容。');
-return;
-}
-setLoading(true, submitBtn, '潤色中...');
-const result = await fetchProsePolishedText(text, state.prosePolishDifficulty);
-if (result) {
-addToPolishingHistory(result);
-state.currentResults = [result];
-state.currentPageNum = 0;
-displayResultsAsBook(state.currentResults);
-switchToReaderView();
-}
-} else {
-let options = {};
-if (state.activeMode === 'lookup') {
-const word = lookupWordInput.value.trim();
-if (!word) {
-showError('請輸入要查找的詞彙。');
-return;
-}
-options = { mode: 'lookup', query: word };
-setLoading(true, submitBtn, '查找中...');
-} else { // 'generate' mode
-options = {
-mode: 'generate',
-difficulty: state.generateDifficulty,
-count: parseInt(wordCountSelect.value),
-topic: promptTextarea.value.trim()
-};
-setLoading(true, submitBtn, '生成中...');
-}
+    try {
+        if (state.activeMode === 'word-polish') {
+            const text = wordPolishTextarea.value.trim();
+            if (!text) {
+                showError('請輸入需要潤色「詞語」的內容。');
+                return;
+            }
+            setLoading(true, submitBtn, '潤色中...');
+            const result = await fetchWordPolishedText(text, state.wordPolishDifficulty);
+            if (result) {
+                addToPolishingHistory(result);
+                state.currentResults = [result];
+                state.currentPageNum = 0;
+                displayResultsAsBook(state.currentResults);
+                switchToReaderView();
+            }
+        } else if (state.activeMode === 'prose-polish') {
+            const text = prosePolishTextarea.value.trim();
+            if (!text) {
+                showError('請輸入需要潤色「文句」的內容。');
+                return;
+            }
+            setLoading(true, submitBtn, '潤色中...');
+            const result = await fetchProsePolishedText(text, state.prosePolishDifficulty);
+            if (result) {
+                addToPolishingHistory(result);
+                state.currentResults = [result];
+                state.currentPageNum = 0;
+                displayResultsAsBook(state.currentResults);
+                switchToReaderView();
+            }
+        } else {
+            let options = {};
+            if (state.activeMode === 'lookup') {
+                const word = lookupWordInput.value.trim();
+                if (!word) {
+                    showError('請輸入要查找的詞彙。');
+                    return;
+                }
+                options = { mode: 'lookup', query: word };
+                setLoading(true, submitBtn, '查找中...');
+            } else { // 'generate' mode
+                options = {
+                    mode: 'generate',
+                    difficulty: state.generateDifficulty,
+                    count: parseInt(wordCountSelect.value),
+                    topic: promptTextarea.value.trim()
+                };
+                setLoading(true, submitBtn, '生成中...');
+            }
 
-const results = await fetchVocabulary(options);
-if (results && results.length > 0) {
-addToLookupHistory(results);
-state.currentResults = results;
-state.currentPageNum = 0;
-displayResultsAsBook(results);
-switchToReaderView();
+            const results = await fetchVocabulary(options);
+            if (results && results.length > 0) {
+                // [修訂] 移除此處的 addToLookupHistory(results);
+                state.currentResults = results;
+                state.currentPageNum = 0;
+                displayResultsAsBook(results);
+                switchToReaderView();
+            }
+        }
+    } catch (error) {
+        console.error('Submit process error:', error);
+        showError(`處理失敗: ${error.message}`);
+    } finally {
+        setLoading(false, submitBtn);
+        switchMode(state.activeMode);
+    }
 }
-}
-} catch (error) {
-console.error('Submit process error:', error);
-showError(`處理失敗: ${error.message}`);
-} finally {
-setLoading(false, submitBtn);
-switchMode(state.activeMode);
-}
-}
-
+  
 async function fetchProsePolishedText(text, difficulty) {
 const systemPrompt = `你是一位專業的中文文學編輯，擅長將平實的文字改寫得更具文采和深度。
 你的任務是要在維持原文字數絕不減少的大前提下，根據使用者提供的文本，進行「文句潤色」，並將原文與潤色後的文句進行配對。
@@ -2324,69 +2367,69 @@ displayResultsAsBook(state.currentResults);
 
 // --- 6. 結果顯示與翻頁 ---
 function displayResultsAsBook(results) {
-const currentPageBeforeRepagination = state.currentPageNum;
-book.innerHTML = '';
-book.style.transition = 'none';
+    const currentPageBeforeRepagination = state.currentPageNum;
+    book.innerHTML = '';
+    book.style.transition = 'none';
 
-function escapeRegExp(string) {
-return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
-function applyHighlights(text, changes, type) {
-if (!changes || changes.length === 0) return text;
-let highlightedText = text;
+    function applyHighlights(text, changes, type) {
+        if (!changes || changes.length === 0) return text;
+        let highlightedText = text;
 
-changes.forEach(change => {
-const wordToFind = type === 'original' ? change.original : change.polished;
-const className = type === 'original' ? 'mark-original' : 'mark-polished';
+        changes.forEach(change => {
+            const wordToFind = type === 'original' ? change.original : change.polished;
+            const className = type === 'original' ? 'mark-original' : 'mark-polished';
 
-if (highlightedText.includes(wordToFind)) {
-const regex = new RegExp(escapeRegExp(wordToFind) + '(?![^<]*>)', 'g');
-highlightedText = highlightedText.replace(regex, `<mark class="${className}">${wordToFind}</mark>`);
-}
-});
-return highlightedText;
-}
+            if (highlightedText.includes(wordToFind)) {
+                const regex = new RegExp(escapeRegExp(wordToFind) + '(?![^<]*>)', 'g');
+                highlightedText = highlightedText.replace(regex, `<mark class="${className}">${wordToFind}</mark>`);
+            }
+        });
+        return highlightedText;
+    }
 
-function escapeHtml(unsafe) {
-if (typeof unsafe !== 'string') return '';
-return unsafe
-.replace(/&/g, "&amp;")
-.replace(/</g, "&lt;")
-.replace(/>/g, "&gt;")
-.replace(/"/g, "&quot;")
-.replace(/'/g, "&#039;");
-}
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
 
-setTimeout(() => {
-if (!bookContainer.clientWidth) return;
-state.totalPages = results.length;
+    setTimeout(() => {
+        if (!bookContainer.clientWidth) return;
+        state.totalPages = results.length;
 
-results.forEach((item, resultIndex) => {
-const pageElement = document.createElement('div');
-pageElement.className = 'page';
-let contentHTML = '';
-const pageTitle = item.title || item.vocab;
+        results.forEach((item, resultIndex) => {
+            const pageElement = document.createElement('div');
+            pageElement.className = 'page';
+            let contentHTML = '';
+            const pageTitle = item.title || item.vocab;
 
-let viewModeClass = '';
-if (item.type === 'word-polish-result') {
-viewModeClass = 'word-polish-view';
-} else if (item.type === 'prose-polish-result') {
-viewModeClass = 'prose-polish-view';
-}
+            let viewModeClass = '';
+            if (item.type === 'word-polish-result') {
+                viewModeClass = 'word-polish-view';
+            } else if (item.type === 'prose-polish-result') {
+                viewModeClass = 'prose-polish-view';
+            }
 
-if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
-let comparisonHTML = '';
-let fullPolishedHtmlWithMarks = '';
-const encodedPolishedTextClean = escapeHtml(item.polishedText);
+            if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
+                let comparisonHTML = '';
+                let fullPolishedHtmlWithMarks = '';
+                const encodedPolishedTextClean = escapeHtml(item.polishedText);
 
-if (item.type === 'prose-polish-result') {
-comparisonHTML = item.comparisonData.map((pair, i) => {
-const originalHTML = (pair.original || '').replace(/\n/g, '<br>');
-const polishedHTML = (pair.polished || '').replace(/\n/g, '<br>');
+                if (item.type === 'prose-polish-result') {
+                    comparisonHTML = item.comparisonData.map((pair, i) => {
+                        const originalHTML = (pair.original || '').replace(/\n/g, '<br>');
+                        const polishedHTML = (pair.polished || '').replace(/\n/g, '<br>');
 
-return `
+                        return `
 <div class="comparison-pair">
 <div>
 <div class="para-marker">原文區塊 ${i + 1}</div>
@@ -2398,22 +2441,22 @@ return `
 </div>
 </div>
 `;
-}).join('');
+                    }).join('');
 
-fullPolishedHtmlWithMarks = item.comparisonData.map(p => p.polished).join('\n\n');
+                    fullPolishedHtmlWithMarks = item.comparisonData.map(p => p.polished).join('\n\n');
 
-} else { // 'word-polish'
-const originalParas = item.originalText.split('\n').filter(p => p.trim() !== '');
-const polishedParas = item.polishedText.split('\n').filter(p => p.trim() !== '');
-const loopCount = Math.max(originalParas.length, polishedParas.length);
+                } else { // 'word-polish'
+                    const originalParas = item.originalText.split('\n').filter(p => p.trim() !== '');
+                    const polishedParas = item.polishedText.split('\n').filter(p => p.trim() !== '');
+                    const loopCount = Math.max(originalParas.length, polishedParas.length);
 
-for (let i = 0; i < loopCount; i++) {
-const originalP = originalParas[i] || '';
-const polishedP = polishedParas[i] || '';
-const highlightedOriginalP = applyHighlights(escapeHtml(originalP), item.changes, 'original');
-const highlightedPolishedP = applyHighlights(escapeHtml(polishedP), item.changes, 'polished');
+                    for (let i = 0; i < loopCount; i++) {
+                        const originalP = originalParas[i] || '';
+                        const polishedP = polishedParas[i] || '';
+                        const highlightedOriginalP = applyHighlights(escapeHtml(originalP), item.changes, 'original');
+                        const highlightedPolishedP = applyHighlights(escapeHtml(polishedP), item.changes, 'polished');
 
-comparisonHTML += `
+                        comparisonHTML += `
 <div class="comparison-pair">
 <div>
 <div class="para-marker">原文段落 ${i + 1}</div>
@@ -2425,12 +2468,12 @@ comparisonHTML += `
 </div>
 </div>
 `;
-}
+                    }
 
-fullPolishedHtmlWithMarks = applyHighlights(escapeHtml(item.polishedText), item.changes, 'polished');
-}
+                    fullPolishedHtmlWithMarks = applyHighlights(escapeHtml(item.polishedText), item.changes, 'polished');
+                }
 
-contentHTML = `
+                contentHTML = `
 <h2 class="vocab-header">${escapeHtml(pageTitle)}</h2>
 <div class="view-switcher">
 <button class="view-btn active" data-view="full-text-${resultIndex}">閱覽全文</button>
@@ -2449,42 +2492,49 @@ contentHTML = `
 </div>
 `;
 
-} else { // Vocab type
-const examplesHTML = item.examples.map(ex => `<li>${escapeHtml(ex)}</li>`).join('');
-contentHTML = `
-<h2 class="vocab-header">${escapeHtml(pageTitle)}</h2>
+            } else { // Vocab type
+                const examplesHTML = item.examples.map(ex => `<li>${escapeHtml(ex)}</li>`).join('');
+                // [修訂] 將詞彙物件序列化並儲存在按鈕上
+                const vocabItemJson = escapeHtml(JSON.stringify(item));
+                contentHTML = `
+<h2 class="vocab-header">
+    <span style="flex-grow: 1;">${escapeHtml(pageTitle)}</span>
+    <button class="icon-btn save-vocab-btn" data-vocab-item='${vocabItemJson}' title="納入紀錄">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+    </button>
+</h2>
 <div class="vocab-definition-container">
 <p class="vocab-definition">${escapeHtml(item.definition)}</p>
 </div>
 <ul class="vocab-examples">${examplesHTML}</ul>
 `;
-}
+            }
 
-pageElement.innerHTML = `<div class="page-content ${viewModeClass}">${contentHTML}</div>`;
-book.appendChild(pageElement);
+            pageElement.innerHTML = `<div class="page-content ${viewModeClass}">${contentHTML}</div>`;
+            book.appendChild(pageElement);
 
-if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
-const switcher = pageElement.querySelector('.view-switcher');
-switcher.addEventListener('click', (e) => {
-if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('active')) {
-switcher.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-e.target.classList.add('active');
-const viewToShow = e.target.dataset.view;
-const pageContent = e.target.closest('.page-content');
-const fullTextView = pageContent.querySelector(`[id^="full-text-"]`);
-const comparisonView = pageContent.querySelector(`[id^="comparison-"]`);
+            if (item.type === 'word-polish-result' || item.type === 'prose-polish-result') {
+                const switcher = pageElement.querySelector('.view-switcher');
+                switcher.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('active')) {
+                        switcher.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        const viewToShow = e.target.dataset.view;
+                        const pageContent = e.target.closest('.page-content');
+                        const fullTextView = pageContent.querySelector(`[id^="full-text-"]`);
+                        const comparisonView = pageContent.querySelector(`[id^="comparison-"]`);
 
-fullTextView.classList.toggle('hidden', !viewToShow.startsWith('full-text'));
-comparisonView.classList.toggle('hidden', !viewToShow.startsWith('comparison'));
-}
-});
-}
-});
+                        fullTextView.classList.toggle('hidden', !viewToShow.startsWith('full-text'));
+                        comparisonView.classList.toggle('hidden', !viewToShow.startsWith('comparison'));
+                    }
+                });
+            }
+        });
 
-const newPage = Math.min(currentPageBeforeRepagination, state.totalPages - 1);
-goToPage(newPage, true);
+        const newPage = Math.min(currentPageBeforeRepagination, state.totalPages - 1);
+        goToPage(newPage, true);
 
-}, 50);
+    }, 50);
 }
 
 function goToPage(pageNum, immediate = false) {
@@ -2514,6 +2564,30 @@ function dragEnd() { if (!isDragging) return; isDragging = false; const threshol
 
 async function handleReaderClick(e) {
     const target = e.target;
+
+    // [修訂] 新增儲存詞彙按鈕的處理邏輯
+    const saveBtn = target.closest('.save-vocab-btn');
+    if (saveBtn) {
+        e.preventDefault();
+        const vocabItemData = saveBtn.dataset.vocabItem;
+        if (vocabItemData) {
+            try {
+                const vocabItem = JSON.parse(vocabItemData);
+                if (confirm(`您確定要將「${vocabItem.vocab}」納進紀錄嗎？`)) {
+                    addToLookupHistory([vocabItem]); // 以陣列形式傳遞單個詞彙
+                    showToast(`「${vocabItem.vocab}」已納入紀錄`, 'success');
+                    // 讓按鈕失效，避免重複儲存
+                    saveBtn.disabled = true;
+                    saveBtn.style.opacity = '0.5';
+                    saveBtn.style.cursor = 'default';
+                }
+            } catch (error) {
+                console.error("Failed to parse vocab item data:", error);
+                showToast('儲存失敗，資料格式錯誤', 'error');
+            }
+        }
+        return; // 結束函數
+    }
 
     // 處理「複製全文」按鈕的邏輯 (保留不變)
     const copyBtn = target.closest('.copy-full-text-btn');
@@ -2552,6 +2626,8 @@ async function handleReaderClick(e) {
     }
 }
 
+
+  
 function showToast(message, type = 'info') {
 vocabToast.textContent = message;
 vocabToast.className = 'vocab-toast'; // Reset classes
