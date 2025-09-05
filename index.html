@@ -2092,7 +2092,7 @@ const response = await fetch(API_URL, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
 body: JSON.stringify({
-model: "DeepSeek-V3-1",
+model: "Qwen3-235B-A22B-Instruct-2507-FP8",
 messages: [{ role: "user", content: systemPrompt }],
 response_format: { type: "json_object" },
 max_tokens: 4096,
