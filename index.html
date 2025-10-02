@@ -2256,7 +2256,7 @@ ${jsonFormatInstruction}`;
     try {
         // [修訂] 只在 generate 模式下進行重試迴圈，增加 maxRetries 到 15
         if (mode === 'generate') {
-            let maxRetries = 15;
+            let maxRetries = 30;
             let results = null;
 
             while (maxRetries > 0) {
