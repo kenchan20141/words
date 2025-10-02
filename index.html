@@ -2215,47 +2215,48 @@ async function fetchVocabulary(options) {
 
     if (mode === 'lookup') {
         systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是為使用者提供的特定詞彙，提供詳細的解釋和文學例句。
-    使用者指定的詞彙: "${query}"
+使用者指定的詞彙: "${query}"
 
-    重要指示:
-    1. 你必須提供該詞彙的精確解釋。
-    2. 你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
-    3. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
-    4. 所有文字都必須是繁體中文。
-    5. 詞彙要白話一點，不要古典用詞。
+重要指示:
+1. 你必須提供該詞彙的精確解釋。
+2. 你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+3. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+4. 所有文字都必須是繁體中文。
+5. 詞彙要白話一點，不要古典用詞。
 
-    JSON 格式:
-    ${jsonFormatInstruction}`;
+JSON 格式:
+${jsonFormatInstruction}`;
     } else { // generate mode
         const topicInstruction = topic ? `請圍繞「${topic}」這個主題來發想。` : '請隨機選擇主題。';
-        const historyVocabs = state.lookupHistory.slice(0, 20).map(item => item.vocab).join(', ');
+        // [修訂] 取所有 historyVocabs，不限制數量
+        const historyVocabs = state.lookupHistory.map(item => item.vocab).join(', ');
 
         systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的詞彙。
-    使用者設定:
-    - 難度（1-5顆星）: ${difficulty}
-    - 生成數量: ${count}
-    - 主題偏好: ${topicInstruction}
+使用者設定:
+- 難度（1-5顆星）: ${difficulty}
+- 生成數量: ${count}
+- 主題偏好: ${topicInstruction}
 
-    重要指示:
-    1. 生成的詞彙應該符合指定的難度，難度愈低，詞彙愈白話，愈常見。${difficulty}中3顆星代表相當白話，在一般現代文學作品中經常使用。即使用家在${difficulty}選五顆星，亦絕對不可以生成古典作品中的詞彙及自組生澀的詞彙，例如「頹燄」、「淒騷」、「覓紂」，前字和後字的組合是硬湊的，請必須生成在數據庫上有實際用例和組合的詞彙。
-    2. 為每個生成的詞彙提供精確的解釋、以及五句文學例句。
-    3. 每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
-    4. 生成的詞彙【絕對不能】重複。請避免生成以下最近使用過的詞彙：${historyVocabs}。
-    5. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
-    6. 所有文字都必須是繁體中文。
-    7. 為了確保每次都能生成全新的內容，請將此唯一請求 ID 納入考量：${Date.now()}。
+重要指示:
+1. 生成的詞彙應該符合指定的難度，難度愈低，詞彙愈白話，愈常見。${difficulty}中3顆星代表相當白話，在一般現代文學作品中經常使用。即使用家在${difficulty}選五顆星，亦絕對不可以生成古典作品中的詞彙。
+2. 為每個生成的詞彙提供精確的解釋、以及五句文學例句。
+3. 每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+4. 生成的詞彙【絕對不能】重複。【絕對不能生成以下任何已知詞彙，否則此生成視為無效】：${historyVocabs}。請產生全新、未見過的詞彙，強調創造性和多樣性，絕對避免任何列出的詞彙。
+5. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+6. 所有文字都必須是繁體中文。
+7. 為了確保每次都能生成全新的內容，請將此唯一請求 ID 納入考量：${Date.now()}。
 
-    JSON 格式 (results 陣列中應有 ${count} 個物件):
-    ${jsonFormatInstruction}`;
+JSON 格式 (results 陣列中應有 ${count} 個物件):
+${jsonFormatInstruction}`;
     }
 
     try {
-        // [新增] 只在 generate 模式下進行重試迴圈
+        // [修訂] 只在 generate 模式下進行重試迴圈，增加 maxRetries 到 15
         if (mode === 'generate') {
-            let maxRetries = 5; // 最大重試次數，避免無限循環
+            let maxRetries = 15;
             let results = null;
 
-            while (maxRetries > 0 && !results) {
+            while (maxRetries > 0) {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
@@ -2264,7 +2265,8 @@ async function fetchVocabulary(options) {
                         messages: [{ role: "user", content: systemPrompt }],
                         response_format: { type: "json_object" },
                         max_tokens: 4096,
-                        temperature: 1
+                        // [修訂] 提高 temperature 到 1.2，增加多樣性
+                        temperature: 1.2
                     })
                 });
 
@@ -2282,7 +2284,6 @@ async function fetchVocabulary(options) {
                         console.warn(`詞彙 "${item.vocab || '未知'}" 的資料不完整或格式錯誤，將被過濾。`);
                         return;
                     }
-                    // Ensure there are exactly 5 examples, padding with placeholders if necessary
                     while(item.examples.length < 5) {
                         item.examples.push(`[缺少例句]`);
                     }
@@ -2294,14 +2295,15 @@ async function fetchVocabulary(options) {
                     item.id = `${timestamp}-${item.vocab}`;
                 });
 
-                const validResults = parsedData.results.filter(item => item.vocab && item.definition && item.examples);
+                let validResults = parsedData.results.filter(item => item.vocab && item.definition && item.examples);
 
-                // [新增] 檢查重複：使用 Set 比對 history 中的 vocab
+                // [修訂] 檢查與所有 historyVocabs 的重複
                 const historyVocabsSet = new Set(state.lookupHistory.map(item => item.vocab));
-                const hasDuplicates = validResults.some(result => historyVocabsSet.has(result.vocab));
+                const duplicates = validResults.filter(result => historyVocabsSet.has(result.vocab));
+                const hasDuplicates = duplicates.length > 0;
 
                 if (hasDuplicates) {
-                    console.warn(`生成結果有重複，剩餘重試次數：${--maxRetries}`); // 只記錄到 console，不顯示給用戶
+                    console.warn(`生成結果有 ${duplicates.length} 個重複，剩餘重試次數：${--maxRetries}`); // 記錄重複數量
                     continue; // 重試
                 }
 
@@ -2309,11 +2311,58 @@ async function fetchVocabulary(options) {
                     throw new Error("API 回應的所有詞彙資料均不完整。");
                 }
 
-                results = validResults; // 成功，跳出迴圈
+                results = validResults; // 成功
+                break; // 跳出迴圈
             }
 
+            // [修訂] Fallback：若全重試失敗，生成一次並過濾重複，回傳非重複部分
             if (!results) {
-                throw new Error("多次生成後仍無法產生不重複的詞彙，請稍後重試。");
+                console.error("重試達上限，啟用 fallback 過濾重複詞彙。");
+                // 最後一次生成
+                const fallbackResponse = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
+                    body: JSON.stringify({
+                        model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                        messages: [{ role: "user", content: systemPrompt }],
+                        response_format: { type: "json_object" },
+                        max_tokens: 4096,
+                        temperature: 1.2
+                    })
+                });
+
+                if (!fallbackResponse.ok) throw new Error(`Fallback API 請求失敗，狀態碼：${fallbackResponse.status}`);
+                const fallbackData = await fallbackResponse.json();
+                const fallbackParsed = JSON.parse(fallbackData.choices[0].message.content);
+
+                if (!fallbackParsed.results || !Array.isArray(fallbackParsed.results)) {
+                    throw new Error("Fallback 回應格式錯誤。");
+                }
+
+                fallbackParsed.results.forEach(item => {
+                    if (!item.vocab || !item.definition || !item.examples || !Array.isArray(item.examples)) {
+                        console.warn(`Fallback 詞彙 "${item.vocab || '未知'}" 的資料不完整，將被過濾。`);
+                        return;
+                    }
+                    while(item.examples.length < 5) {
+                        item.examples.push(`[缺少例句]`);
+                    }
+                    item.examples = item.examples.slice(0, 5);
+
+                    item.type = 'vocab';
+                    const timestamp = new Date().toISOString();
+                    item.generatedDate = timestamp;
+                    item.id = `${timestamp}-${item.vocab}`;
+                });
+
+                let fallbackValid = fallbackParsed.results.filter(item => item.vocab && item.definition && item.examples);
+                const historyVocabsSet = new Set(state.lookupHistory.map(item => item.vocab));
+                results = fallbackValid.filter(result => !historyVocabsSet.has(result.vocab)); // 過濾所有重複
+
+                if (results.length === 0) {
+                    throw new Error("Fallback 後仍無有效不重複詞彙，請稍後重試。");
+                }
+                console.warn(`Fallback 過濾後剩 ${results.length} 個不重複詞彙。`);
             }
 
             return results;
