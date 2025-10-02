@@ -2194,113 +2194,182 @@ return null;
 }
 
 async function fetchVocabulary(options) {
-const { mode, query, difficulty, count, topic } = options;
-let systemPrompt;
+    const { mode, query, difficulty, count, topic } = options;
+    let systemPrompt;
 
-const jsonFormatInstruction = `{
-"results": [
-{
-"vocab": "詞彙",
-"definition": "對該詞彙的精闢中文解釋",
-"examples": [
-"來自真實中文文學作品的例句一",
-"來自真實中文文學作品的例句二",
-"來自真實中文文學作品的例句三",
-"來自真實中文文學作品的例句四",
-"來自真實中文文學作品的例句五"
-]
-}
-]
-}`;
+    const jsonFormatInstruction = `{
+    "results": [
+    {
+    "vocab": "詞彙",
+    "definition": "對該詞彙的精闢中文解釋",
+    "examples": [
+    "來自真實中文文學作品的例句一",
+    "來自真實中文文學作品的例句二",
+    "來自真實中文文學作品的例句三",
+    "來自真實中文文學作品的例句四",
+    "來自真實中文文學作品的例句五"
+    ]
+    }
+    ]
+    }`;
 
-if (mode === 'lookup') {
-systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是為使用者提供的特定詞彙，提供詳細的解釋和文學例句。
-使用者指定的詞彙: "${query}"
+    if (mode === 'lookup') {
+        systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是為使用者提供的特定詞彙，提供詳細的解釋和文學例句。
+    使用者指定的詞彙: "${query}"
 
-重要指示:
-1. 你必須提供該詞彙的精確解釋。
-2. 你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
-3. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
-4. 所有文字都必須是繁體中文。
-5. 詞彙要白話一點，不要古典用詞。
+    重要指示:
+    1. 你必須提供該詞彙的精確解釋。
+    2. 你必須提供五句例句。每一句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+    3. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+    4. 所有文字都必須是繁體中文。
+    5. 詞彙要白話一點，不要古典用詞。
 
-JSON 格式:
-${jsonFormatInstruction}`;
-} else { // generate mode
-const topicInstruction = topic ? `請圍繞「${topic}」這個主題來發想。` : '請隨機選擇主題。';
-const historyVocabs = state.lookupHistory.slice(0, 20).map(item => item.vocab).join(', ');
+    JSON 格式:
+    ${jsonFormatInstruction}`;
+    } else { // generate mode
+        const topicInstruction = topic ? `請圍繞「${topic}」這個主題來發想。` : '請隨機選擇主題。';
+        const historyVocabs = state.lookupHistory.slice(0, 20).map(item => item.vocab).join(', ');
 
-systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的詞彙。
-使用者設定:
-- 難度（1-5顆星）: ${difficulty}
-- 生成數量: ${count}
-- 主題偏好: ${topicInstruction}
+        systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的詞彙。
+    使用者設定:
+    - 難度（1-5顆星）: ${difficulty}
+    - 生成數量: ${count}
+    - 主題偏好: ${topicInstruction}
 
-重要指示:
-1. 生成的詞彙應該符合指定的難度，難度愈低，詞彙愈白話，愈常見。${difficulty}中3顆星代表相當白話，在一般現代文學作品中經常使用。即使用家在${difficulty}選五顆星，亦絕對不可以生成古典作品中的詞彙。
-2. 為每個生成的詞彙提供精確的解釋、以及五句文學例句。
-3. 每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
-4. 生成的詞彙【絕對不能】重複。請避免生成以下最近使用過的詞彙：${historyVocabs}。
-5. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
-6. 所有文字都必須是繁體中文。
-7. 為了確保每次都能生成全新的內容，請將此唯一請求 ID 納入考量：${Date.now()}。
+    重要指示:
+    1. 生成的詞彙應該符合指定的難度，難度愈低，詞彙愈白話，愈常見。${difficulty}中3顆星代表相當白話，在一般現代文學作品中經常使用。即使用家在${difficulty}選五顆星，亦絕對不可以生成古典作品中的詞彙及自組生澀的詞彙，例如「頹燄」，必須生成在數據庫上有實際用例的詞彙。
+    2. 為每個生成的詞彙提供精確的解釋、以及五句文學例句。
+    3. 每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
+    4. 生成的詞彙【絕對不能】重複。請避免生成以下最近使用過的詞彙：${historyVocabs}。
+    5. 你的回傳內容必須嚴格遵循以下的 JSON 格式，不要包含任何 markdown 語法或額外說明。
+    6. 所有文字都必須是繁體中文。
+    7. 為了確保每次都能生成全新的內容，請將此唯一請求 ID 納入考量：${Date.now()}。
 
-JSON 格式 (results 陣列中應有 ${count} 個物件):
-${jsonFormatInstruction}`;
-}
+    JSON 格式 (results 陣列中應有 ${count} 個物件):
+    ${jsonFormatInstruction}`;
+    }
 
-try {
-const response = await fetch(API_URL, {
-method: 'POST',
-headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
-body: JSON.stringify({
-model: "Qwen3-235B-A22B-Instruct-2507-FP8",
-messages: [{ role: "user", content: systemPrompt }],
-response_format: { type: "json_object" },
-max_tokens: 4096,
-temperature: 1
-})
-});
+    try {
+        // [新增] 只在 generate 模式下進行重試迴圈
+        if (mode === 'generate') {
+            let maxRetries = 5; // 最大重試次數，避免無限循環
+            let results = null;
 
-if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
-const data = await response.json();
-if (!data.choices?.[0]?.message?.content) throw new Error("API 回應格式不正確。");
-const parsedData = JSON.parse(data.choices[0].message.content);
+            while (maxRetries > 0 && !results) {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
+                    body: JSON.stringify({
+                        model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                        messages: [{ role: "user", content: systemPrompt }],
+                        response_format: { type: "json_object" },
+                        max_tokens: 4096,
+                        temperature: 1
+                    })
+                });
 
-if (!parsedData.results || !Array.isArray(parsedData.results) || parsedData.results.length === 0) {
-throw new Error("API 回應的 JSON 內容不完整或格式錯誤。");
-}
+                if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+                const data = await response.json();
+                if (!data.choices?.[0]?.message?.content) throw new Error("API 回應格式不正確。");
+                const parsedData = JSON.parse(data.choices[0].message.content);
 
-parsedData.results.forEach(item => {
-if (!item.vocab || !item.definition || !item.examples || !Array.isArray(item.examples)) {
-console.warn(`詞彙 "${item.vocab || '未知'}" 的資料不完整或格式錯誤，將被過濾。`);
-return;
-}
-// Ensure there are exactly 5 examples, padding with placeholders if necessary
-while(item.examples.length < 5) {
-    item.examples.push(`[缺少例句]`);
-}
-item.examples = item.examples.slice(0, 5);
+                if (!parsedData.results || !Array.isArray(parsedData.results) || parsedData.results.length === 0) {
+                    throw new Error("API 回應的 JSON 內容不完整或格式錯誤。");
+                }
+
+                parsedData.results.forEach(item => {
+                    if (!item.vocab || !item.definition || !item.examples || !Array.isArray(item.examples)) {
+                        console.warn(`詞彙 "${item.vocab || '未知'}" 的資料不完整或格式錯誤，將被過濾。`);
+                        return;
+                    }
+                    // Ensure there are exactly 5 examples, padding with placeholders if necessary
+                    while(item.examples.length < 5) {
+                        item.examples.push(`[缺少例句]`);
+                    }
+                    item.examples = item.examples.slice(0, 5);
+
+                    item.type = 'vocab';
+                    const timestamp = new Date().toISOString();
+                    item.generatedDate = timestamp;
+                    item.id = `${timestamp}-${item.vocab}`;
+                });
+
+                const validResults = parsedData.results.filter(item => item.vocab && item.definition && item.examples);
+
+                // [新增] 檢查重複：使用 Set 比對 history 中的 vocab
+                const historyVocabsSet = new Set(state.lookupHistory.map(item => item.vocab));
+                const hasDuplicates = validResults.some(result => historyVocabsSet.has(result.vocab));
+
+                if (hasDuplicates) {
+                    console.warn(`生成結果有重複，剩餘重試次數：${--maxRetries}`); // 只記錄到 console，不顯示給用戶
+                    continue; // 重試
+                }
+
+                if (validResults.length === 0) {
+                    throw new Error("API 回應的所有詞彙資料均不完整。");
+                }
+
+                results = validResults; // 成功，跳出迴圈
+            }
+
+            if (!results) {
+                throw new Error("多次生成後仍無法產生不重複的詞彙，請稍後重試。");
+            }
+
+            return results;
+        } else {
+            // [原代碼] lookup 模式保持不變
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
+                body: JSON.stringify({
+                    model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                    messages: [{ role: "user", content: systemPrompt }],
+                    response_format: { type: "json_object" },
+                    max_tokens: 4096,
+                    temperature: 1
+                })
+            });
+
+            if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+            const data = await response.json();
+            if (!data.choices?.[0]?.message?.content) throw new Error("API 回應格式不正確。");
+            const parsedData = JSON.parse(data.choices[0].message.content);
+
+            if (!parsedData.results || !Array.isArray(parsedData.results) || parsedData.results.length === 0) {
+                throw new Error("API 回應的 JSON 內容不完整或格式錯誤。");
+            }
+
+            parsedData.results.forEach(item => {
+                if (!item.vocab || !item.definition || !item.examples || !Array.isArray(item.examples)) {
+                    console.warn(`詞彙 "${item.vocab || '未知'}" 的資料不完整或格式錯誤，將被過濾。`);
+                    return;
+                }
+                // Ensure there are exactly 5 examples, padding with placeholders if necessary
+                while(item.examples.length < 5) {
+                    item.examples.push(`[缺少例句]`);
+                }
+                item.examples = item.examples.slice(0, 5);
 
 
-item.type = 'vocab';
-const timestamp = new Date().toISOString();
-item.generatedDate = timestamp;
-item.id = `${timestamp}-${item.vocab}`;
-});
+                item.type = 'vocab';
+                const timestamp = new Date().toISOString();
+                item.generatedDate = timestamp;
+                item.id = `${timestamp}-${item.vocab}`;
+            });
 
-const validResults = parsedData.results.filter(item => item.vocab && item.definition && item.examples);
-if(validResults.length === 0) {
-    throw new Error("API 回應的所有詞彙資料均不完整。");
-}
-return validResults;
-
-} catch(error) {
-console.error("API Error (Vocab):", error);
-if (error instanceof SyntaxError) showError("API 回傳格式錯誤，無法解析。請重試。");
-else showError(`獲取資料時發生錯誤: ${error.message}`);
-return null;
-}
+            const validResults = parsedData.results.filter(item => item.vocab && item.definition && item.examples);
+            if(validResults.length === 0) {
+                throw new Error("API 回應的所有詞彙資料均不完整。");
+            }
+            return validResults;
+        }
+    } catch(error) {
+        console.error("API Error (Vocab):", error);
+        if (error instanceof SyntaxError) showError("API 回傳格式錯誤，無法解析。請重試。");
+        else showError(`獲取資料時發生錯誤: ${error.message}`);
+        return null;
+    }
 }
 
 function addToLookupHistory(results) {
