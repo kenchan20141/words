@@ -1365,10 +1365,9 @@ input[type="text"]:not(.no-modal-editor):hover {
 <form id="generate-form" class="hidden">
 <div class="form-group">
 <label for="generate-difficulty">深度</label>
-<div class="rating-dots" id="generate-difficulty-rating" data-rating="3">
-<div class="rating-dot" data-value="1"></div><div class="rating-dot" data-value="2"></div>
-<div class="rating-dot selected" data-value="3"></div><div class="rating-dot" data-value="4"></div>
-<div class="rating-dot" data-value="5"></div>
+<div class="rating-dots" id="generate-difficulty-rating" data-rating="2">
+<div class="rating-dot" data-value="1"></div><div class="rating-dot selected" data-value="2"></div>
+<div class="rating-dot" data-value="3"></div>
 </div>
 </div>
 <div class="form-group">
@@ -1754,7 +1753,7 @@ const API_KEYS = [
 // --- 2. 狀態管理 ---
 let state = {
 activeMode: 'lookup', 
-generateDifficulty: 3,
+generateDifficulty: 2,
 wordPolishDifficulty: 3,
 prosePolishDifficulty: 3,
 lookupHistory: JSON.parse(localStorage.getItem('vocabHistory_v3')) || [],
@@ -1796,34 +1795,38 @@ root.style.setProperty('--reader-font-size', `${state.fontSize}rem`);
 };
 
 function initializeDifficultyRating(ratingContainer) {
-if (!ratingContainer) return;
-const dots = ratingContainer.querySelectorAll('.rating-dot');
-let stateKey;
-if (ratingContainer.id.includes('generate')) stateKey = 'generateDifficulty';
-else if (ratingContainer.id.includes('word-polish')) stateKey = 'wordPolishDifficulty';
-else if (ratingContainer.id.includes('prose-polish')) stateKey = 'prosePolishDifficulty';
-else return;
+    if (!ratingContainer) return;
+    const dots = ratingContainer.querySelectorAll('.rating-dot');
+    let stateKey;
+    if (ratingContainer.id.includes('generate')) stateKey = 'generateDifficulty';
+    else if (ratingContainer.id.includes('word-polish')) stateKey = 'wordPolishDifficulty';
+    else if (ratingContainer.id.includes('prose-polish')) stateKey = 'prosePolishDifficulty';
+    else return;
 
-const updateDots = () => {
-dots.forEach(dot => {
-dot.classList.toggle('selected', parseInt(dot.dataset.value) <= state[stateKey]);
-});
-};
+    const updateDots = () => {
+        dots.forEach(dot => {
+            dot.classList.toggle('selected', parseInt(dot.dataset.value) <= state[stateKey]);
+        });
+    };
 
-dots.forEach(dot => {
-dot.addEventListener('click', () => {
-state[stateKey] = parseInt(dot.dataset.value);
-ratingContainer.dataset.rating = state[stateKey];
-updateDots();
-});
-dot.addEventListener('mouseover', () => {
-const hoverValue = parseInt(dot.dataset.value);
-dots.forEach(d => d.classList.toggle('selected', d.dataset.value <= hoverValue));
-});
+    dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+        const maxLimit = (stateKey === 'generateDifficulty') ? 3 : 5;  // 新增：根據模式動態設定上限
+        state[stateKey] = Math.min(maxLimit, parseInt(dot.dataset.value));
+        ratingContainer.dataset.rating = state[stateKey];
+        updateDots();
+    });
+    dot.addEventListener('mouseover', () => {
+        const hoverValue = parseInt(dot.dataset.value);
+        dots.forEach(d => d.classList.toggle('selected', parseInt(d.dataset.value) <= hoverValue));
+    });
 });
 
 ratingContainer.addEventListener('mouseleave', updateDots);
 updateDots();
+
+    ratingContainer.addEventListener('mouseleave', updateDots);
+    updateDots();
 }
 
 initTheme();
@@ -2231,14 +2234,14 @@ ${jsonFormatInstruction}`;
         // [修訂] 取所有 historyVocabs，不限制數量
         const historyVocabs = state.lookupHistory.map(item => item.vocab).join(', ');
 
-        systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的詞彙。
+        systemPrompt = `你是一個詞彙學家與文學評論家。你的任務是根據使用者設定的條件，生成一批較為艱深或富有文學性的繁體中文詞彙，每個詞只有兩個字或四個字，生成詞彙不要以「自然景象」為相關，例如日、月、星、霧，須生成敘事抒情文會運用的詞彙。
 使用者設定:
-- 難度（1-5顆星）: ${difficulty}
+- 難度（1-3顆星）: ${difficulty}
 - 生成數量: ${count}
 - 主題偏好: ${topicInstruction}
 
 重要指示:
-1. 生成的詞彙應該符合指定的難度，難度愈低，詞彙愈白話，愈常見。${difficulty}中3顆星代表相當白話，在一般現代文學作品中經常使用。即使用家在${difficulty}選五顆星，亦絕對不可以生成古典作品中的詞彙及自組生澀的詞彙，例如「頹燄」、「覓紂」等，前一字與後一字的組合是自組的，因此不合適，請必須生成在數據庫上有實際用例和組合常見度高的詞彙。
+1. 生成的詞彙應該符合指定的難度，難度愈低，詞彙愈白話，愈常見。${difficulty}中3顆星代表相當白話，在一般現代文學作品中經常使用。絕對不可以生成古典作品中的詞彙及自組生澀的詞彙，例如「頹燄」、「覓紂」等，前一字與後一字的組合是自組的，因此不合適，請必須生成在數據庫上有實際用例和組合常見度高的詞彙。
 2. 為每個生成的詞彙提供精確的解釋、以及五句文學例句。
 3. 每一句例句都必須引用自【真實世界中繁體中文作家的文學作品】，但【絕對不能】標示作家或作品名稱。
 4. 生成的詞彙【絕對不能】重複。【絕對不能生成以下任何已知詞彙，否則此生成視為無效】：${historyVocabs}。請產生全新、未見過的詞彙，強調創造性和多樣性，絕對避免任何列出的詞彙。
