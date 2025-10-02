@@ -2970,7 +2970,7 @@ async function evaluateSentence(vocab, userSentence) {
     
     學生的句子是：「${userSentence}」
 
-    請評估這個句子。你的回傳內容【必須】是單一的 JSON 物件，不含任何其他文字或 markdown 語法，此物件須包含三個 key：
+    請評估這個句子，絕對不可以在評語中顯示造句中「${vocab}」不是一個正確的詞彙、非常用詞彙或運用不當，造句中「${vocab}」一詞本身完全沒有問題。你的回傳內容【必須】是單一的 JSON 物件，不含任何其他文字或 markdown 語法，此物件須包含三個 key：
     1. "is_correct": (boolean) 如果詞彙使用正確且句子語法通順，則為 true。
     2. "comment": (string)一句話的簡短評語（繁體中文），解釋你的判斷。
     3. "visual": (string) 根據恰當程度，給予以下三者之一的視覺化標籤： "appropriate"（完全正確）、"needs_improvement"（語法或用法有小瑕疵但可理解）、"incorrect"（詞彙使用錯誤或句子不通順）。
