@@ -1737,12 +1737,9 @@ const quizMixSelection = document.getElementById('quiz-mix-selection');
 
 
 // --- API 配置 ---
-const API_URL = "https://chatapi.akash.network/api/v1/chat/completions";
+const API_URL = "https://text.pollinations.ai/openai";
 const API_KEYS = [
-    "sk-GruTbLTbtSeWof3rEBjtIg", // 您的第一個 KEY
-    "sk-N2hJEV5h9dQl9K_bUrxLtw",
-    "sk-ugZDzju3AbV2QeJS1Y415Q"
-    // 如果有更多，可以繼續往下添加...
+    "Jeq-UCxbpvrqUEzN"
 ];
 
   function getRandomApiKey() {
@@ -2095,7 +2092,7 @@ const response = await fetch(API_URL, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
 body: JSON.stringify({
-model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+model: "openai-large",
 messages: [{ role: "user", content: systemPrompt }],
 response_format: { type: "json_object" },
 max_tokens: 4096,
@@ -2165,7 +2162,7 @@ const response = await fetch(API_URL, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
 body: JSON.stringify({
-model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+model: "openai-large",
 messages: [{ role: "user", content: systemPrompt }],
 response_format: { type: "json_object" },
 max_tokens: 4096,
@@ -2264,7 +2261,7 @@ ${jsonFormatInstruction}`;
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
                     body: JSON.stringify({
-                        model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                        model: "openai-large",
                         messages: [{ role: "user", content: systemPrompt }],
                         response_format: { type: "json_object" },
                         max_tokens: 4096,
@@ -2326,7 +2323,7 @@ ${jsonFormatInstruction}`;
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
                     body: JSON.stringify({
-                        model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                        model: "openai-large",
                         messages: [{ role: "user", content: systemPrompt }],
                         response_format: { type: "json_object" },
                         max_tokens: 4096,
@@ -2375,7 +2372,7 @@ ${jsonFormatInstruction}`;
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
                 body: JSON.stringify({
-                    model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                    model: "openai-large",
                     messages: [{ role: "user", content: systemPrompt }],
                     response_format: { type: "json_object" },
                     max_tokens: 4096,
@@ -3069,7 +3066,7 @@ async function fetchAIBatchSentences(vocabArray) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
             body: JSON.stringify({
-                model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                model: "openai-large",
                 messages: [{ role: "user", content: systemPrompt }],
                 response_format: { type: "json_object" },
                 max_tokens: 2048,
@@ -3118,7 +3115,7 @@ async function evaluateSentence(vocab, userSentence) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomApiKey()}` },
             body: JSON.stringify({
-                model: "Qwen3-235B-A22B-Instruct-2507-FP8",
+                model: "openai-large",
                 messages: [{ role: "user", content: systemPrompt }],
                 response_format: { type: "json_object" },
                 max_tokens: 512,
