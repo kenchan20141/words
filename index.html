@@ -3089,32 +3089,36 @@ async function fetchAIBatchSentences(vocabArray) {
 }
 
 async function evaluateSentence(vocab, userSentence) {
-    const systemPrompt = `你是一位嚴格而公正的中文老師。有位學生需要用「${vocab}」一詞造句。
-    
-    學生的句子是：「${userSentence}」
+    // 使用傳統字串拼接，以避免多行模板字串可能引發的解析錯誤
+    const systemPrompt = '你是一位精準、嚴謹的中文文學編輯與詞彙學家。你的任務是深入分析學生使用「' + vocab + '」一詞所造的句子，並提供專業的批改建議。\n\n' +
+        '你的分析必須遵循以下【三步分析法】，並依此順序判斷句子的核心問題：\n\n' +
+        '1.  **第一步：分析「詞彙配搭」(Collocation)**\n' +
+        '    *   檢查「' + vocab + '」與句子中其他詞語的搭配是否自然、合乎習慣用法。\n' +
+        '    *   例如，該形容詞是否能修飾這個名詞？該動詞的施動者或受動者是否恰當？\n\n' +
+        '2.  **第二步：分析「語意邏輯」(Semantics)**\n' +
+        '    *   如果詞彙配搭沒問題，接著檢查整個句子的意思是否合乎邏輯、清晰且完整。\n' +
+        '    *   例如，「自由」是否可以用「玩」這個動詞來描述？句子的比喻或陳述是否成立？\n\n' +
+        '3.  **第三步：分析「語法結構」(Grammar)**\n' +
+        '    *   最後，檢查是否有語法、錯別字或標點符號的錯誤。\n\n' +
+        '你的回傳內容【必須】是單一的 JSON 物件，不含任何其他文字或 markdown 語法，此物件須包含以下 key：\n\n' +
+        '*   `"is_correct"`: (boolean) 僅在上述三步分析**完全**通過時，才為 `true`。\n' +
+        '*   `"comment"`: (string) 你的評語【必須】一針見血地指出最根本的錯誤。例如，如果第一步「詞彙配搭」就錯了，就必須明確指出是哪個詞跟哪個詞搭配錯誤，而不是給出「語意不清」這種模糊的評語。\n' +
+        '*   `"visual"`: (string) 根據恰當程度，給予以下三者之一的標籤： "appropriate"（完全正確）、"needs_improvement"（有小瑕疵）、"incorrect"（有根本性錯誤）。\n' +
+        '*   `"corrected_sentence"`: (string) 【重要】你的訂正建議**必須**修正句子的**根本問題**。如果詞彙配搭或語意錯誤，你應該**重寫一個能正確使用「' + vocab + '」的句子**，而不是在錯誤的句子結構上小修小補。\n\n' +
+        '---\n' +
+        '**批改範例與要求：**\n\n' +
+        '**情境：** 詞彙為「寂寥」，學生造句為「寂寥的自由沒人玩了」。\n\n' +
+        '*   **【錯誤的批改方式】(你不可以這樣做):**\n' +
+        '    *   `"comment": "句子語意表達不夠清楚。"` (評語太模糊)\n' +
+        '    *   `"corrected_sentence": "寂寥的自由讓人再也不想玩了。"` (修正無效，因為沒有解決根本的詞彙配搭錯誤)\n\n' +
+        '*   **【正確的批改方式】(你必須這樣做):**\n' +
+        '    *   `"comment": "詞彙配搭錯誤。「寂寥」通常形容心境或環境，無法用來修飾「自由」；同時，動詞「玩」也與「自由」無法搭配。"` (評語精準，點出兩個核心問題)\n' +
+        '    *   `"corrected_sentence": "在這座空無一人的城市裡，他感到一種深刻的寂寥。"` (完全重寫了一個正確使用「寂寥」的句子)\n' +
+        '---\n\n' +
+        '現在，請根據以上規則，批改以下句子：\n' +
+        '*   **待批改詞彙:** 「' + vocab + '」\n' +
+        '*   **學生造句:** 「' + userSentence + '」';
 
-    請評估這個句子，絕對不可以在評語中顯示造句中「${vocab}」不是一個正確的詞彙、非常用詞彙或運用不當，造句中「${vocab}」一詞本身完全沒有問題。你的回傳內容【必須】是單一的 JSON 物件，不含任何其他文字或 markdown 語法，此物件須包含三個 key：
-    1. "is_correct": (boolean) 如果詞彙使用正確且句子語法通順，則為 true。
-    2. "comment": (string)一句話的簡短評語（繁體中文），解釋你的判斷。
-    3. "visual": (string) 根據恰當程度，給予以下三者之一的視覺化標籤： "appropriate"（完全正確）、"needs_improvement"（語法或用法有小瑕疵但可理解）、"incorrect"（詞彙使用錯誤或句子不通順）。
-4. "corrected_sentence": (string) 【重要】如果 "is_correct" 為 false，此欄位【必須】提供一個以學生原句為基礎、修正其錯誤後的正確句子。如果 "is_correct" 為 true，此欄位應為空字串 ""。
-    
-    JSON 格式範例 (答錯時):
-    {
-      "is_correct": false,
-      "comment": "「蹣跚」通常形容步態，用在這裡形容心情不太合適。",
-      "visual": "incorrect",
-      "corrected_sentence": "在得知壞消息後，他步履蹣跚地走回家。"
-    }
-
-    JSON 格式範例 (答對時):
-    {
-      "is_correct": true,
-      "comment": "句子通順，詞彙運用得當。",
-      "visual": "appropriate",
-      "corrected_sentence": ""
-    }`;
-    
     try {
         const response = await fetch(API_URL, {
             method: 'POST',
@@ -3136,10 +3140,11 @@ async function evaluateSentence(vocab, userSentence) {
             is_correct: false,
             comment: '批改時發生網路錯誤，請稍後再試。',
             visual: 'incorrect',
-            corrected_sentence: '無法提供訂正建議。' // 提供錯誤時的預設值
+            corrected_sentence: '無法提供訂正建議。'
         };
     }
 }
+
 
 function showQuiz() {
     quizErrorMessage.classList.add('hidden');
