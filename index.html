@@ -1648,6 +1648,25 @@ input[type="text"]:not(.no-modal-editor):hover {
 <div class="vocab-toast" id="vocab-toast"></div>
 
 <script>
+
+
+// 輔助函式：從 API 回應中提取純 JSON（剝離 Markdown 程式碼區塊）
+function parseJsonFromResponse(content) {
+    if (!content) return null;
+    // 移除常見的 Markdown 包裝（如 ```json 或 ```
+    let cleanContent = content
+        .replace(/^```(?:json)?\s*\n?/, '')  // 移除開頭
+        .replace(/\n?```(?:\s*json)?$/, '') // 移除結尾
+        .trim();
+    try {
+        return JSON.parse(cleanContent);
+    } catch (e) {
+        console.error('JSON 解析失敗:', e, '原始內容:', content);
+        return null;
+    }
+}
+
+  
 // --- Main application logic ---
 function initializeApp() {
 // --- 1. DOM 元素選擇 ---
@@ -2106,7 +2125,7 @@ temperature: 1
 });
 if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
 const data = await response.json();
-const content = JSON.parse(data.choices?.[0]?.message?.content);
+const content = parseJsonFromResponse(data.choices?.[0]?.message?.content);
 
 if (!content || !Array.isArray(content.comparison) || content.comparison.length === 0) {
 throw new Error("API 未返回有效的 comparison 陣列或格式錯誤。");
@@ -2176,7 +2195,7 @@ temperature: 0.8
 });
 if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
 const data = await response.json();
-const content = JSON.parse(data.choices?.[0]?.message?.content);
+const content = parseJsonFromResponse(data.choices?.[0]?.message?.content);
 
 if (!content || !content.polishedText || !Array.isArray(content.changes)) {
 throw new Error("API 未返回有效的潤色內容或格式錯誤。");
@@ -2278,7 +2297,7 @@ ${jsonFormatInstruction}`;
                 if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
                 const data = await response.json();
                 if (!data.choices?.[0]?.message?.content) throw new Error("API 回應格式不正確。");
-                const parsedData = JSON.parse(data.choices[0].message.content);
+                const parsedData = parseJsonFromResponse(data.choices[0].message.content);
 
                 if (!parsedData.results || !Array.isArray(parsedData.results) || parsedData.results.length === 0) {
                     throw new Error("API 回應的 JSON 內容不完整或格式錯誤。");
@@ -2388,7 +2407,7 @@ ${jsonFormatInstruction}`;
             if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
             const data = await response.json();
             if (!data.choices?.[0]?.message?.content) throw new Error("API 回應格式不正確。");
-            const parsedData = JSON.parse(data.choices[0].message.content);
+           const parsedData = parseJsonFromResponse(data.choices[0].message.content);
 
             if (!parsedData.results || !Array.isArray(parsedData.results) || parsedData.results.length === 0) {
                 throw new Error("API 回應的 JSON 內容不完整或格式錯誤。");
@@ -3080,7 +3099,7 @@ async function fetchAIBatchSentences(vocabArray) {
         });
         if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
         const data = await response.json();
-        return JSON.parse(data.choices?.[0]?.message?.content);
+        return parseJsonFromResponse(data.choices?.[0]?.message?.content);
     } catch (error) {
         console.error("AI Sentence Batch Fetch Error:", error);
         showQuizError("AI 出題時發生錯誤，請稍後重試。");
@@ -3133,7 +3152,7 @@ async function evaluateSentence(vocab, userSentence) {
         });
         if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
         const data = await response.json();
-        return JSON.parse(data.choices?.[0]?.message?.content);
+        return parseJsonFromResponse(data.choices?.[0]?.message?.content);
     } catch (error) {
         console.error("AI Sentence Evaluation Error:", error);
         return {
